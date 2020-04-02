@@ -8,9 +8,9 @@ module Main exposing (..)
 
 
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
-import Html.Attributes exposing (title)
+import Html exposing (Html, Attribute, button, div, text, h1, input)
+import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (..)
 
 
 
@@ -44,12 +44,14 @@ init =
 
 
 type Msg
-  = Increment
-  | Decrement
+  = Change String
 
 
 update : Msg -> Model -> Model
-update msg model = model
+update msg model =
+            case msg of 
+                Change newFood -> 
+                    {model | food = newFood }
 
 
 
@@ -59,5 +61,7 @@ update msg model = model
 view : Model -> Html Msg
 view model =
   div []
-    [  text "Title"
+    [  h1 [] [text "Title"]
+    , text "Add an ingredient"
+    , input [ placeholder "Ingredient", value model.food, onInput Change ] []
     ]
