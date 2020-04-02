@@ -27,7 +27,7 @@ main =
 type alias Ingredient = 
               {
                 food : String
-              , quantity : Int
+              , quantity : Float
               }
 
 
@@ -44,14 +44,22 @@ init =
 
 
 type Msg
-  = Change String
+  = Food String
+  | Quantity String
 
 
 update : Msg -> Model -> Model
 update msg model =
             case msg of 
-                Change newFood -> 
+                Food newFood -> 
                     {model | food = newFood }
+                
+                Quantity quant ->
+                    case String.toFloat quant of
+                        Just x -> 
+                            {model | quantity = x}
+                        Nothing ->
+                            model
 
 
 
@@ -61,7 +69,10 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [  h1 [] [text "Title"]
-    , text "Add an ingredient"
-    , input [ placeholder "Ingredient", value model.food, onInput Change ] []
+    [  h1 [] [text "Secret Krabby Patty recipe"]
+    , div [] [text "Add ingredients"]
+    , div [] [
+          input [ placeholder "Ingredient", value model.food, onInput Food ] []
+        , input [ placeholder "Quantity", value (String.fromFloat model.quantity), onInput Quantity] []
+        ] 
     ]
