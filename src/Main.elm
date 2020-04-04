@@ -28,6 +28,7 @@ type alias Ingredient =
               {
                 food : String
               , quantity : Float
+              , unit : String
               }
 
 
@@ -37,7 +38,8 @@ type alias Model = List Ingredient
 init : Model
 init =
   [{food = ""
-  , quantity = 0}]
+  , quantity = 0
+  , unit = ""}]
 
 
 
@@ -48,6 +50,7 @@ type Msg
   = Food Int String
   | Quantity Int String
   | AddFood
+  | Unit Int String
 
 
 update : Msg -> Model -> Model
@@ -55,7 +58,8 @@ update msg model =
             case msg of 
                 Food num newFood -> updateFood model num newFood 
                 Quantity num quant -> updateQuantity model num quant
-                AddFood -> List.append model [{food = "", quantity = 0}]
+                AddFood -> List.append model [{food = "", quantity = 0, unit = ""}]
+                Unit num unt-> model
 
 updateFood : List Ingredient -> Int -> String -> List Ingredient
 updateFood lst num newFood = 
@@ -100,5 +104,8 @@ viewIngredients lst num =
     [] -> []
     (food::foods) -> [div [] [
           input [placeholder "Ingredient", value food.food, onInput (Food num)] []
-        , input [placeholder "Quantity", value (String.fromFloat food.quantity), onInput (Quantity num)] []]]
+        , input [placeholder "Quantity", value (String.fromFloat food.quantity), onInput (Quantity num)] []
+        , input [placeholder "Units (optional)", value food.unit, onInput (Unit num)] []
+          ]
+        ]
         ++ (viewIngredients foods (num + 1))
