@@ -47,6 +47,7 @@ init =
 type Msg
   = Food Int String
   | Quantity Int String
+  | AddFood
 
 
 update : Msg -> Model -> Model
@@ -54,6 +55,7 @@ update msg model =
             case msg of 
                 Food num newFood -> updateFood model num newFood 
                 Quantity num quant -> updateQuantity model num quant
+                AddFood -> List.append model [{food = "", quantity = 0}]
 
 updateFood : List Ingredient -> Int -> String -> List Ingredient
 updateFood lst num newFood = 
@@ -86,16 +88,17 @@ updateQuantity lst num newQuant =
 view : Model -> Html Msg
 view model =
   div []
-    [  h1 [] [text "Secret Krabby Patty recipe"]
-    , div [] [text "Add ingredients"]
-    , div [] (viewIngredients model 0)
-    ]
+    ([  h1 [] [text "Secret Krabby Patty recipe"]
+    , div [] [text "Add ingredients!"]
+    , button [onClick AddFood] [text "Add another ingredients"]
+     ] ++ viewIngredients model 0)
+    
 
 viewIngredients : List Ingredient -> Int -> List (Html Msg)
 viewIngredients lst num = 
   case lst of
     [] -> []
-    (food::foods) -> [
+    (food::foods) -> [div [] [
           input [placeholder "Ingredient", value food.food, onInput (Food num)] []
-        , input [placeholder "Quantity", value (String.fromFloat food.quantity), onInput (Quantity num)] []]
+        , input [placeholder "Quantity", value (String.fromFloat food.quantity), onInput (Quantity num)] []]]
         ++ (viewIngredients foods (num + 1))
