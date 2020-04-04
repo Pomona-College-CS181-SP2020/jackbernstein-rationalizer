@@ -26,27 +26,18 @@ main =
 
 type alias Ingredient = 
               {
-                food1 : String
-              , quantity1 : Float
-              , food2 : String
-              , quantity2 : Float
-              ,food3 : String
-              , quantity3 : Float
+                food : String
+              , quantity : Float
               }
 
 
-type alias Model = Ingredient
+type alias Model = List Ingredient
 
 
 init : Model
 init =
-  {food1 = ""
-  , quantity1 = 0
-  , food2 = ""
-  , quantity2 = 0
-  , food3 = ""
-  , quantity3 = 0
-  }
+  [{food = ""
+  , quantity = 0}]
 
 
 
@@ -61,23 +52,31 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
             case msg of 
-                Food num newFood -> 
-                    case num of 
-                        1 -> {model | food1 = newFood}
-                        2 -> {model | food2 = newFood}
-                        3 -> {model | food3 = newFood}
-                        _ -> model
-                
-                Quantity num quant ->
-                    case String.toFloat quant of
-                        Just x -> 
-                            case num of
-                                1 -> {model | quantity1 = x}
-                                2 -> {model | quantity2 = x}
-                                3 -> {model | quantity3 = x}
-                                _ -> model
-                        Nothing ->
-                            model
+                Food num newFood -> updateFood model num newFood 
+                Quantity num quant -> updateQuantity model num quant
+
+updateFood : List Ingredient -> Int -> String -> List Ingredient
+updateFood lst num newFood = 
+  case num of
+    0 -> case lst of
+          [] -> []
+          (ing::ings) -> ({ing | food = newFood}::ings)
+    x -> case lst of
+          [] -> []
+          (ing::ings) -> ing :: updateFood ings (num - 1) newFood
+
+updateQuantity : List Ingredient -> Int -> String -> List Ingredient
+updateQuantity lst num newQuant =
+  case num of 
+    0 -> case lst of
+          [] -> []
+          (ing::ings) -> case String.toFloat newQuant of
+                          Nothing -> (ing::ings)
+                          Just x -> ({ing | quantity = x}::ings)
+    x -> case lst of
+          [] -> []
+          (ing::ings) -> ing :: updateQuantity ings (num - 1) newQuant
+
 
 
 
@@ -89,16 +88,14 @@ view model =
   div []
     [  h1 [] [text "Secret Krabby Patty recipe"]
     , div [] [text "Add ingredients"]
-    , div [] [
-          input [ placeholder "Ingredient", value model.food1, onInput (Food 1)] []
-        , input [ placeholder "Quantity", value (String.fromFloat model.quantity1), onInput (Quantity 1)] []
-        ] 
-    , div [] [
-          input [ placeholder "Ingredient", value model.food2, onInput (Food 2)] []
-        , input [ placeholder "Quantity", value (String.fromFloat model.quantity2), onInput (Quantity 2)] []
-        ]
-    , div [] [
-          input [ placeholder "Ingredient", value model.food3, onInput (Food 3)] []
-        , input [ placeholder "Quantity", value (String.fromFloat model.quantity3), onInput (Quantity 3)] []
-        ]
+    , div [] (viewIngredients model 0)
     ]
+
+viewIngredients : List Ingredient -> Int -> List (Html Msg)
+viewIngredients lst num = 
+  case lst of
+    [] -> []
+    (food::foods) -> [
+          input [placeholder "Ingredient", value food.food, onInput (Food num)] []
+        , input [placeholder "Quantity", value (String.fromFloat food.quantity), onInput (Quantity num)] []]
+        ++ (viewIngredients foods (num + 1))
