@@ -31,15 +31,26 @@ type alias Ingredient =
               , unit : String
               }
 
+type alias Recipe = 
+              {
+                ingredients : List Ingredient
+              , complete : Bool
+              }
 
-type alias Model = List Ingredient
+
+type alias Model = Recipe
 
 
 init : Model
 init =
-  [{food = ""
+  {ingredients = 
+  [
+    {food = ""
   , quantity = 0
-  , unit = ""}]
+  , unit = ""}
+  ]
+  , complete = False
+  }
 
 
 
@@ -56,9 +67,9 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
             case msg of 
-                Food num newFood -> updateFood model num newFood 
-                Quantity num quant -> updateQuantity model num quant
-                AddFood -> List.append model [{food = "", quantity = 0, unit = ""}]
+                Food num newFood -> {model | ingredients = updateFood model.ingredients num newFood}
+                Quantity num quant -> {model | ingredients = updateQuantity model.ingredients num quant}
+                AddFood -> {model | ingredients = List.append model.ingredients [{food = "", quantity = 0, unit = ""}]}
                 Unit num unt-> model
 
 updateFood : List Ingredient -> Int -> String -> List Ingredient
@@ -95,7 +106,7 @@ view model =
     ([  h1 [] [text "Secret Krabby Patty recipe"]
     , div [] [text "Add ingredients!"]
     , button [onClick AddFood] [text "Add another ingredients"]
-     ] ++ viewIngredients model 0)
+     ] ++ viewIngredients model.ingredients 0)
     
 
 viewIngredients : List Ingredient -> Int -> List (Html Msg)
