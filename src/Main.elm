@@ -66,7 +66,7 @@ update msg model =
       Food num newFood -> {model | ingredients = updateFood model.ingredients num newFood}
       Quantity num quant -> {model | ingredients = updateQuantity model.ingredients num quant}
       AddFood -> {model | ingredients = List.append model.ingredients [{food = "", quantity = 0, unit = ""}]}
-      Unit num unt-> model
+      Unit num unt-> {model | ingredients = updateUnits model.ingredients num unt}
       RecipeDone -> {model | complete = True}
       DeleteFood -> 
         if List.length model.ingredients > 1
@@ -77,12 +77,14 @@ update msg model =
 updateFood : List Ingredient -> Int -> String -> List Ingredient
 updateFood lst num newFood = 
   case num of
-    0 -> case lst of
-      [] -> []
-      (ing::ings) -> ({ing | food = newFood}::ings)
-    x -> case lst of
-      [] -> []
-      (ing::ings) -> ing :: updateFood ings (num - 1) newFood
+    0 -> 
+      case lst of
+        [] -> []
+        (ing::ings) -> ({ing | food = newFood}::ings)
+    x -> 
+      case lst of
+        [] -> []
+        (ing::ings) -> ing :: updateFood ings (num - 1) newFood
 
 updateQuantity : List Ingredient -> Int -> String -> List Ingredient
 updateQuantity lst num newQuant =
@@ -97,6 +99,18 @@ updateQuantity lst num newQuant =
       case lst of
         [] -> []
         (ing::ings) -> ing :: updateQuantity ings (num - 1) newQuant
+
+updateUnits : List Ingredient -> Int -> String -> List Ingredient
+updateUnits lst num newUnit = 
+  case num of 
+    0 -> 
+      case lst of
+        [] -> []
+        (ing::ings) -> ({ing | unit = newUnit}::ings)
+    x ->
+      case lst of
+        [] -> []
+        (ing::ings) -> ing :: updateUnits ings (num - 1) newUnit
 
 
 
