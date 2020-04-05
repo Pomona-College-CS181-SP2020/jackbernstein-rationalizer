@@ -109,11 +109,11 @@ view model =
       div [] []
     False -> 
       div []
-        ([  h1 [] [text "Secret Krabby Patty recipe"]
+        ([  h1 [] [text "Secret Krabby Patty Formula"]
         , div [] [text "Add ingredients!"]
         , button [onClick AddFood] [text "Add another ingredients"]
         ] ++ viewIngredients model.ingredients 0
-        ++ [button [onClick RecipeDone] [text "Submit Recipe"]])
+        ++ [button [onClick RecipeDone] [text "Submit Formula"]])
     
 
 viewIngredients : List Ingredient -> Int -> List (Html Msg)
