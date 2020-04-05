@@ -62,6 +62,7 @@ type Msg
   | Quantity Int String
   | AddFood
   | Unit Int String
+  | RecipeDone
 
 
 update : Msg -> Model -> Model
@@ -71,6 +72,7 @@ update msg model =
                 Quantity num quant -> {model | ingredients = updateQuantity model.ingredients num quant}
                 AddFood -> {model | ingredients = List.append model.ingredients [{food = "", quantity = 0, unit = ""}]}
                 Unit num unt-> model
+                RecipeDone -> {model | complete = True}
 
 updateFood : List Ingredient -> Int -> String -> List Ingredient
 updateFood lst num newFood = 
@@ -102,11 +104,16 @@ updateQuantity lst num newQuant =
 
 view : Model -> Html Msg
 view model =
-  div []
-    ([  h1 [] [text "Secret Krabby Patty recipe"]
-    , div [] [text "Add ingredients!"]
-    , button [onClick AddFood] [text "Add another ingredients"]
-     ] ++ viewIngredients model.ingredients 0)
+  case model.complete of 
+    True -> 
+      div [] []
+    False -> 
+      div []
+        ([  h1 [] [text "Secret Krabby Patty recipe"]
+        , div [] [text "Add ingredients!"]
+        , button [onClick AddFood] [text "Add another ingredients"]
+        ] ++ viewIngredients model.ingredients 0
+        ++ [button [onClick RecipeDone] [text "Submit Recipe"]])
     
 
 viewIngredients : List Ingredient -> Int -> List (Html Msg)
