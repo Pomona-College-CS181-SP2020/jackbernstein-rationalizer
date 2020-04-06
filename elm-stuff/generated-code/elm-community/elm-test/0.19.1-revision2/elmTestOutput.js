@@ -6316,12 +6316,73 @@ var $author$project$Test$Runner$Node$run = F2(
 				update: $author$project$Test$Runner$Node$update
 			});
 	});
-var $elm_explorations$test$Test$todo = function (desc) {
-	return $elm_explorations$test$Test$Internal$failNow(
-		{description: desc, reason: $elm_explorations$test$Test$Runner$Failure$TODO});
-};
-var $author$project$Example$suite = $elm_explorations$test$Test$todo('Implement our first test. See https://package.elm-lang.org/packages/elm-explorations/test/latest for how to do this!');
-var $author$project$Test$Generated$Main665904567$main = A2(
+var $elm_explorations$test$Test$Runner$Failure$Equality = F2(
+	function (a, b) {
+		return {$: 'Equality', a: a, b: b};
+	});
+var $elm$core$String$contains = _String_contains;
+var $elm_explorations$test$Test$Expectation$Pass = {$: 'Pass'};
+var $elm_explorations$test$Expect$pass = $elm_explorations$test$Test$Expectation$Pass;
+var $elm_explorations$test$Test$Internal$toString = _Debug_toString;
+var $elm_explorations$test$Expect$testWith = F5(
+	function (makeReason, label, runTest, expected, actual) {
+		return A2(runTest, actual, expected) ? $elm_explorations$test$Expect$pass : $elm_explorations$test$Test$Expectation$fail(
+			{
+				description: label,
+				reason: A2(
+					makeReason,
+					$elm_explorations$test$Test$Internal$toString(expected),
+					$elm_explorations$test$Test$Internal$toString(actual))
+			});
+	});
+var $elm$core$String$toInt = _String_toInt;
+var $elm_explorations$test$Expect$equateWith = F4(
+	function (reason, comparison, b, a) {
+		var isJust = function (x) {
+			if (x.$ === 'Just') {
+				return true;
+			} else {
+				return false;
+			}
+		};
+		var isFloat = function (x) {
+			return isJust(
+				$elm$core$String$toFloat(x)) && (!isJust(
+				$elm$core$String$toInt(x)));
+		};
+		var usesFloats = isFloat(
+			$elm_explorations$test$Test$Internal$toString(a)) || isFloat(
+			$elm_explorations$test$Test$Internal$toString(b));
+		var floatError = A2($elm$core$String$contains, reason, 'not') ? 'Do not use Expect.notEqual with floats. Use Float.notWithin instead.' : 'Do not use Expect.equal with floats. Use Float.within instead.';
+		return usesFloats ? $elm_explorations$test$Expect$fail(floatError) : A5($elm_explorations$test$Expect$testWith, $elm_explorations$test$Test$Runner$Failure$Equality, reason, comparison, b, a);
+	});
+var $elm_explorations$test$Expect$equal = A2($elm_explorations$test$Expect$equateWith, 'Expect.equal', $elm$core$Basics$eq);
+var $elm_explorations$test$Test$Internal$blankDescriptionFailure = $elm_explorations$test$Test$Internal$failNow(
+	{
+		description: 'This test has a blank description. Let\'s give it a useful one!',
+		reason: $elm_explorations$test$Test$Runner$Failure$Invalid($elm_explorations$test$Test$Runner$Failure$BadDescription)
+	});
+var $elm_explorations$test$Test$test = F2(
+	function (untrimmedDesc, thunk) {
+		var desc = $elm$core$String$trim(untrimmedDesc);
+		return $elm$core$String$isEmpty(desc) ? $elm_explorations$test$Test$Internal$blankDescriptionFailure : A2(
+			$elm_explorations$test$Test$Internal$Labeled,
+			desc,
+			$elm_explorations$test$Test$Internal$UnitTest(
+				function (_v0) {
+					return _List_fromArray(
+						[
+							thunk(_Utils_Tuple0)
+						]);
+				}));
+	});
+var $author$project$Example$suite = A2(
+	$elm_explorations$test$Test$test,
+	'two plus two equals four',
+	function (_v0) {
+		return A2($elm_explorations$test$Expect$equal, 4, 2 + 2);
+	});
+var $author$project$Test$Generated$Main2948256752$main = A2(
 	$author$project$Test$Runner$Node$run,
 	{
 		paths: _List_fromArray(
@@ -6329,7 +6390,7 @@ var $author$project$Test$Generated$Main665904567$main = A2(
 		processes: 4,
 		report: $author$project$Test$Reporter$Reporter$ConsoleReport($author$project$Console$Text$UseColor),
 		runs: $elm$core$Maybe$Nothing,
-		seed: 19901144668095
+		seed: 405636475978462
 	},
 	$elm_explorations$test$Test$concat(
 		_List_fromArray(
@@ -6340,10 +6401,10 @@ var $author$project$Test$Generated$Main665904567$main = A2(
 				_List_fromArray(
 					[$author$project$Example$suite]))
 			])));
-_Platform_export({'Test':{'Generated':{'Main665904567':{'init':$author$project$Test$Generated$Main665904567$main($elm$json$Json$Decode$int)(0)}}}});}(this));
+_Platform_export({'Test':{'Generated':{'Main2948256752':{'init':$author$project$Test$Generated$Main2948256752$main($elm$json$Json$Decode$int)(0)}}}});}(this));
 return this.Elm;
 })({});
-var pipeFilename = "/tmp/elm_test-17947.sock";
+var pipeFilename = "/tmp/elm_test-18528.sock";
 // Make sure necessary things are defined.
 if (typeof Elm === "undefined") {
   throw "test runner config error: Elm is not defined. Make sure you provide a file compiled by Elm!";
