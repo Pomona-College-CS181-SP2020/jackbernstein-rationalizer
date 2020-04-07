@@ -6357,6 +6357,13 @@ var $elm_explorations$test$Expect$equateWith = F4(
 		return usesFloats ? $elm_explorations$test$Expect$fail(floatError) : A5($elm_explorations$test$Expect$testWith, $elm_explorations$test$Test$Runner$Failure$Equality, reason, comparison, b, a);
 	});
 var $elm_explorations$test$Expect$equal = A2($elm_explorations$test$Expect$equateWith, 'Expect.equal', $elm$core$Basics$eq);
+var $author$project$Main$init = {
+	complete: false,
+	ingredients: _List_fromArray(
+		[
+			{food: '', quantity: 0, unit: ''}
+		])
+};
 var $elm_explorations$test$Test$Internal$blankDescriptionFailure = $elm_explorations$test$Test$Internal$failNow(
 	{
 		description: 'This test has a blank description. Let\'s give it a useful one!',
@@ -6377,12 +6384,33 @@ var $elm_explorations$test$Test$test = F2(
 				}));
 	});
 var $author$project$Example$suite = A2(
-	$elm_explorations$test$Test$test,
-	'two plus two equals four',
-	function (_v0) {
-		return A2($elm_explorations$test$Expect$equal, 4, 2 + 2);
-	});
-var $author$project$Test$Generated$Main2948256752$main = A2(
+	$elm_explorations$test$Test$describe,
+	'The String module',
+	_List_fromArray(
+		[
+			A2(
+			$elm_explorations$test$Test$describe,
+			'The Main module',
+			_List_fromArray(
+				[
+					A2(
+					$elm_explorations$test$Test$describe,
+					'Main.data',
+					_List_fromArray(
+						[
+							A2(
+							$elm_explorations$test$Test$test,
+							'Initial list has one item',
+							function (_v0) {
+								return A2(
+									$elm_explorations$test$Expect$equal,
+									$elm$core$List$length($author$project$Main$init.ingredients),
+									1);
+							})
+						]))
+				]))
+		]));
+var $author$project$Test$Generated$Main2415950145$main = A2(
 	$author$project$Test$Runner$Node$run,
 	{
 		paths: _List_fromArray(
@@ -6390,7 +6418,7 @@ var $author$project$Test$Generated$Main2948256752$main = A2(
 		processes: 4,
 		report: $author$project$Test$Reporter$Reporter$ConsoleReport($author$project$Console$Text$UseColor),
 		runs: $elm$core$Maybe$Nothing,
-		seed: 405636475978462
+		seed: 71685586039447
 	},
 	$elm_explorations$test$Test$concat(
 		_List_fromArray(
@@ -6401,10 +6429,10 @@ var $author$project$Test$Generated$Main2948256752$main = A2(
 				_List_fromArray(
 					[$author$project$Example$suite]))
 			])));
-_Platform_export({'Test':{'Generated':{'Main2948256752':{'init':$author$project$Test$Generated$Main2948256752$main($elm$json$Json$Decode$int)(0)}}}});}(this));
+_Platform_export({'Test':{'Generated':{'Main2415950145':{'init':$author$project$Test$Generated$Main2415950145$main($elm$json$Json$Decode$int)(0)}}}});}(this));
 return this.Elm;
 })({});
-var pipeFilename = "/tmp/elm_test-18528.sock";
+var pipeFilename = "/tmp/elm_test-24467.sock";
 // Make sure necessary things are defined.
 if (typeof Elm === "undefined") {
   throw "test runner config error: Elm is not defined. Make sure you provide a file compiled by Elm!";
