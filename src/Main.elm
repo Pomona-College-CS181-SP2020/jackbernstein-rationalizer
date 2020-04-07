@@ -166,7 +166,7 @@ view model =
             div []
                 ([ h1 [] [ text "Secret Krabby Patty Formula" ]
                  , div [] [ text "Add ingredients!" ]
-                 , div [] [ button [ onClick AddFood ] [ text "Add another ingredients" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
+                 , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
                  ]
                     ++ viewIngredients model.ingredients 0
                     ++ [ button [ onClick RecipeDone ] [ text "Submit Formula" ] ]
