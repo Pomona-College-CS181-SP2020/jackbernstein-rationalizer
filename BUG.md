@@ -8,5 +8,17 @@ Fix: Was calling the wrong Msg, probably came from using copy and paste
 
 Problem: Once numbers are input for quantity, can't delete the numbers to get back to 0
 
-Fix: TBD!
+Fix: Added case for empty string
+
+# 4-7-2020 BUG 3
+
+Problem: Cannot input decimal numbers
+
+Fix: TBD
+
+# 4-7-2020 BUG 4
+
+Problem: Can submit recipe even when ingredients/quantity left empty
+
+Fix: TBD
 

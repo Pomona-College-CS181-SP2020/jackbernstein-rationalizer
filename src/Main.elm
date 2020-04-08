@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Attribute, Html, button, div, h1, input, text)
+import Html exposing (Attribute, Html, button, div, h1, input, text, img)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 
@@ -117,7 +117,9 @@ updateQuantity lst num newQuant =
                 ing :: ings ->
                     case String.toFloat newQuant of
                         Nothing ->
-                            ing :: ings
+                            if String.length newQuant == 0
+                            then { ing | quantity = 0 } :: ings
+                            else ing :: ings
 
                         Just x ->
                             { ing | quantity = x } :: ings
@@ -165,6 +167,7 @@ view model =
         False ->
             div []
                 ([ h1 [] [ text "Secret Krabby Patty Formula" ]
+                 , img [ src "Main.jpg"] []
                  , div [] [ text "Add ingredients!" ]
                  , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
                  ]
