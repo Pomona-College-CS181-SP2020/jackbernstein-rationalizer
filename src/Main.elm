@@ -20,7 +20,7 @@ main =
 
 type alias Ingredient =
     { food : String
-    , quantity : Float
+    , quantity : String
     , unit : String
     }
 
@@ -39,7 +39,7 @@ init : Model
 init =
     { ingredients =
         [ { food = ""
-          , quantity = 0
+          , quantity = ""
           , unit = ""
           }
         ]
@@ -70,7 +70,7 @@ update msg model =
             { model | ingredients = updateQuantity model.ingredients num quant }
 
         AddFood ->
-            { model | ingredients = List.append model.ingredients [ { food = "", quantity = 0, unit = "" } ] }
+            { model | ingredients = List.append model.ingredients [ { food = "", quantity = "0", unit = "" } ] }
 
         Unit num unt ->
             { model | ingredients = updateUnits model.ingredients num unt }
@@ -117,12 +117,10 @@ updateQuantity lst num newQuant =
                 ing :: ings ->
                     case String.toFloat newQuant of
                         Nothing ->
-                            if String.length newQuant == 0
-                            then { ing | quantity = 0 } :: ings
-                            else ing :: ings
+                            (checkIncompleteFloat ing newQuant) :: ings
 
                         Just x ->
-                            { ing | quantity = x } :: ings
+                            { ing | quantity = newQuant } :: ings
 
         x ->
             case lst of
@@ -131,6 +129,17 @@ updateQuantity lst num newQuant =
 
                 ing :: ings ->
                     ing :: updateQuantity ings (num - 1) newQuant
+
+
+checkIncompleteFloat : Ingredient -> String -> Ingredient
+checkIncompleteFloat ing str = 
+    let
+        digits = String.foldr (\a b -> ((Char.isDigit a || a == '.') && b)) True str
+        decimals = String.indexes "." str
+    in
+        if digits && List.length decimals < 2
+        then {ing | quantity = str}
+        else ing
 
 
 updateUnits : List Ingredient -> Int -> String -> List Ingredient
@@ -167,7 +176,7 @@ view model =
         False ->
             div []
                 ([ h1 [] [ text "Secret Krabby Patty Formula" ]
-                 , img [ src "Main.jpg"] []
+                 , img [ src "burger.jpg"] []
                  , div [] [ text "Add ingredients!" ]
                  , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
                  ]
@@ -190,7 +199,7 @@ viewIngredients lst num =
         food :: foods ->
             [ div []
                 [ input [ placeholder "Ingredient", value food.food, onInput (Food num) ] []
-                , input [ placeholder "Quantity", value (String.fromFloat food.quantity), onInput (Quantity num) ] []
+                , input [ placeholder "Quantity", value food.quantity, onInput (Quantity num) ] []
                 , input [ placeholder "Units (optional)", value food.unit, onInput (Unit num) ] []
                 ]
             ]
