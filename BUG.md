@@ -8,5 +8,5 @@ Fix: Was calling the wrong Msg, probably came from using copy and paste
 
 Problem: Once numbers are input for quantity, can't delete the numbers to get back to 0
 
-Fix: TBD
+Fix: TBD!
 
