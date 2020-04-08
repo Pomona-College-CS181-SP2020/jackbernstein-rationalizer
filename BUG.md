@@ -14,11 +14,17 @@ Fix: Added case for empty string
 
 Problem: Cannot input decimal numbers
 
-Fix: TBD
+Fix: Changed quantity to a string
 
 # 4-7-2020 BUG 4
 
 Problem: Can submit recipe even when ingredients/quantity left empty
+
+Fix: Checks each text box before submitting
+
+# 4-8-2020 BUG 5
+
+Problem: Does not check if quantity is incomplete float before submitting
 
 Fix: TBD
 

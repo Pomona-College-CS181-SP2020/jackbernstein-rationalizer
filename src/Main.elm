@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Attribute, Html, button, div, h1, input, text, img)
+import Html exposing (Attribute, Html, button, div, h1, img, input, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 
@@ -70,13 +70,13 @@ update msg model =
             { model | ingredients = updateQuantity model.ingredients num quant }
 
         AddFood ->
-            { model | ingredients = List.append model.ingredients [ { food = "", quantity = "0", unit = "" } ] }
+            { model | ingredients = List.append model.ingredients [ { food = "", quantity = "", unit = "" } ] }
 
         Unit num unt ->
             { model | ingredients = updateUnits model.ingredients num unt }
 
         RecipeDone ->
-            { model | complete = True }
+            { model | complete = areIngredientsFilled model.ingredients True }
 
         DeleteFood ->
             if List.length model.ingredients > 1 then
@@ -84,6 +84,20 @@ update msg model =
 
             else
                 model
+
+
+areIngredientsFilled : List Ingredient -> Bool -> Bool
+areIngredientsFilled ings b =
+    case ings of
+        [] ->
+            True
+
+        i :: is ->
+            if String.isEmpty i.food || String.isEmpty i.quantity || String.toFloat i.quantity == Nothing then
+                False
+
+            else
+                areIngredientsFilled is b
 
 
 updateFood : List Ingredient -> Int -> String -> List Ingredient
@@ -117,7 +131,7 @@ updateQuantity lst num newQuant =
                 ing :: ings ->
                     case String.toFloat newQuant of
                         Nothing ->
-                            (checkIncompleteFloat ing newQuant) :: ings
+                            checkIncompleteFloat ing newQuant :: ings
 
                         Just x ->
                             { ing | quantity = newQuant } :: ings
@@ -132,14 +146,19 @@ updateQuantity lst num newQuant =
 
 
 checkIncompleteFloat : Ingredient -> String -> Ingredient
-checkIncompleteFloat ing str = 
+checkIncompleteFloat ing str =
     let
-        digits = String.foldr (\a b -> ((Char.isDigit a || a == '.') && b)) True str
-        decimals = String.indexes "." str
+        digits =
+            String.foldr (\a b -> (Char.isDigit a || a == '.') && b) True str
+
+        decimals =
+            String.indexes "." str
     in
-        if digits && List.length decimals < 2
-        then {ing | quantity = str}
-        else ing
+    if digits && List.length decimals < 2 then
+        { ing | quantity = str }
+
+    else
+        ing
 
 
 updateUnits : List Ingredient -> Int -> String -> List Ingredient
@@ -176,7 +195,7 @@ view model =
         False ->
             div []
                 ([ h1 [] [ text "Secret Krabby Patty Formula" ]
-                 , img [ src "burger.jpg"] []
+                 , img [ src "burger.jpg" ] []
                  , div [] [ text "Add ingredients!" ]
                  , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
                  ]
