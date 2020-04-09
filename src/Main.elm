@@ -28,6 +28,7 @@ type alias Ingredient =
 type alias Recipe =
     { ingredients : List Ingredient
     , complete : Bool
+    , submitError : Bool
     }
 
 
@@ -44,6 +45,7 @@ init =
           }
         ]
     , complete = False
+    , submitError = False
     }
 
 
@@ -64,19 +66,19 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         Food num newFood ->
-            { model | ingredients = updateFood model.ingredients num newFood }
+            { model | ingredients = updateFood model.ingredients num newFood, submitError = False }
 
         Quantity num quant ->
-            { model | ingredients = updateQuantity model.ingredients num quant }
+            { model | ingredients = updateQuantity model.ingredients num quant, submitError = False }
 
         AddFood ->
-            { model | ingredients = List.append model.ingredients [ { food = "", quantity = "", unit = "" } ] }
+            { model | ingredients = List.append model.ingredients [ { food = "", quantity = "", unit = "" } ], submitError = False }
 
         Unit num unt ->
-            { model | ingredients = updateUnits model.ingredients num unt }
+            { model | ingredients = updateUnits model.ingredients num unt, submitError = False }
 
         RecipeDone ->
-            { model | complete = areIngredientsFilled model.ingredients True }
+            { model | complete = areIngredientsFilled model.ingredients True, submitError = not (areIngredientsFilled model.ingredients True) }
 
         DeleteFood ->
             if List.length model.ingredients > 1 then
@@ -190,8 +192,7 @@ view : Model -> Html Msg
 view model =
     case model.complete of
         True ->
-            div []
-                []
+            listIngredients model.ingredients
 
         False ->
             div []
@@ -202,7 +203,17 @@ view model =
                  ]
                     ++ viewIngredients model.ingredients 0
                     ++ [ button [ onClick RecipeDone ] [ text "Submit Formula" ] ]
+                    ++ errorMessage model
+                    
                 )
+
+errorMessage : Model -> List (Html Msg)
+errorMessage model = 
+    case model.submitError of
+        True ->
+            [div [] [text "Must fill out all ingredients and quantities"]]
+        False -> 
+            [div [] []]
 
 
 listIngredients : List Ingredient -> Html Msg
