@@ -26,5 +26,11 @@ Fix: Checks each text box before submitting
 
 Problem: Does not check if quantity is incomplete float before submitting
 
+Fix: Changed boolean logic to string logic
+
+# 4-9-2020
+
+Problem: Build fails while trying to install elm
+
 Fix: TBD
 

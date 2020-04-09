@@ -93,11 +93,12 @@ areIngredientsFilled ings b =
             True
 
         i :: is ->
-            if String.isEmpty i.food || String.isEmpty i.quantity || String.toFloat i.quantity == Nothing then
-                False
-
-            else
-                areIngredientsFilled is b
+            if String.endsWith "." i.quantity
+            then False
+            else  
+                if String.isEmpty i.food || String.isEmpty i.quantity
+                then False
+                else areIngredientsFilled is b
 
 
 updateFood : List Ingredient -> Int -> String -> List Ingredient
@@ -223,3 +224,4 @@ viewIngredients lst num =
                 ]
             ]
                 ++ viewIngredients foods (num + 1)
+
