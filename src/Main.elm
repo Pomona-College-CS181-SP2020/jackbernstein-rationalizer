@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Attribute, Html, button, div, h1, img, input, text)
+import Html exposing (Attribute, Html, button, div, h1, img, input, text, li, ol)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 
@@ -192,12 +192,19 @@ view : Model -> Html Msg
 view model =
     case model.complete of
         True ->
-            listIngredients model.ingredients
+            div [] [
+                h1 [] [text "Time to Rationalize!"]
+                , div [] [ text "This is your recipe"]
+                , ol [] (listIngredients model.ingredients)
+                , div [] [ text """Would you like to select an ingredient, input a quantity, and build the new recipe around it, or would you 
+                                like to scale all the ingredients?"""]
+                , div [] [button [] [text "Select ingredient"], button [] [text "scale"]] 
+            ]
 
         False ->
             div []
                 ([ h1 [] [ text "Secret Krabby Patty Formula" ]
-                 , img [ src "burger.jpg" ] []
+                 , img [ src "burger.jpg" , style "height"  "90px", style "width" "160px"] []
                  , div [] [ text "Add ingredients!" ]
                  , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
                  ]
@@ -207,18 +214,23 @@ view model =
                     
                 )
 
+
+
+listIngredients : List Ingredient -> List (Html Msg)
+listIngredients lst =
+    case lst of 
+        [] -> []
+        ing :: ings ->
+            li [] [text (ing.food ++ ": " ++ ing.quantity ++ " " ++ ing.unit)] :: listIngredients ings
+
+
 errorMessage : Model -> List (Html Msg)
 errorMessage model = 
     case model.submitError of
         True ->
             [div [] [text "Must fill out all ingredients and quantities"]]
         False -> 
-            [div [] []]
-
-
-listIngredients : List Ingredient -> Html Msg
-listIngredients lst =
-    div [] []
+            []
 
 
 viewIngredients : List Ingredient -> Int -> List (Html Msg)
