@@ -328,7 +328,7 @@ buttonIngredients lst numb =
             []
 
         ing :: ings ->
-            div [] [ text ing.food, input [ value ing.quantity, onInput (Rationalize numb) ] [] ] :: buttonIngredients ings (numb + 1)
+            div [] [ text ing.food, input [ value ing.quantity, onInput (Rationalize numb) ] [], text ing.unit ] :: buttonIngredients ings (numb + 1)
 
 
 listIngredients : List Ingredient -> List (Html Msg)
