@@ -29,6 +29,8 @@ type alias Recipe =
     { ingredients : List Ingredient
     , complete : Bool
     , submitError : Bool
+    , rationalize : Bool
+    , scale : Bool
     }
 
 
@@ -46,6 +48,8 @@ init =
         ]
     , complete = False
     , submitError = False
+    , rationalize = False
+    , scale = False
     }
 
 
@@ -60,6 +64,8 @@ type Msg
     | Unit Int String
     | RecipeDone
     | DeleteFood
+    | Rationalize
+    | Scale
 
 
 update : Msg -> Model -> Model
@@ -86,6 +92,11 @@ update msg model =
 
             else
                 model
+        Rationalize ->
+            { model | rationalize = True}
+
+        Scale ->
+            { model | scale = True} 
 
 
 areIngredientsFilled : List Ingredient -> Bool -> Bool
@@ -192,14 +203,24 @@ view : Model -> Html Msg
 view model =
     case model.complete of
         True ->
-            div [] [
-                h1 [] [text "Time to Rationalize!"]
-                , div [] [ text "This is your recipe"]
-                , ol [] (listIngredients model.ingredients)
-                , div [] [ text """Would you like to select an ingredient, input a quantity, and build the new recipe around it, or would you 
-                                like to scale all the ingredients?"""]
-                , div [] [button [] [text "Select ingredient"], button [] [text "scale"]] 
-            ]
+            case model.rationalize of 
+                True -> 
+                    div [] ([
+                        div [] [text "Select an ingredient to rationalize "]
+                    ] ++ buttonIngredients model.ingredients)
+                False -> 
+                    case model.scale of 
+                        True ->
+                            div [] []
+                        False -> 
+                            div [] [
+                                h1 [] [text "Time to Rationalize!"]
+                                , div [] [ text "This is your recipe"]
+                                , ol [] (listIngredients model.ingredients)
+                                , div [] [ text """Would you like to select an ingredient, input a quantity, and build the new recipe around it, or would you 
+                                                like to scale all the ingredients?"""]
+                                , div [] [button [onClick Rationalize] [text "Select ingredient"], button [onClick Scale] [text "scale"]] 
+                            ]
 
         False ->
             div []
@@ -215,6 +236,12 @@ view model =
                 )
 
 
+buttonIngredients : List Ingredient -> List (Html Msg)
+buttonIngredients lst = 
+    case lst of 
+        [] -> []
+        ing :: ings -> 
+            button [] [text ing.food] :: buttonIngredients ings  
 
 listIngredients : List Ingredient -> List (Html Msg)
 listIngredients lst =
