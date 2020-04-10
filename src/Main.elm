@@ -97,66 +97,86 @@ update msg model =
                 model
 
         RationalizeTrue ->
-            let 
-                ingreds = newRecipe model.ingredients
+            let
+                ingreds =
+                    newRecipe model.ingredients
             in
-                { model | rationalize = True , newIngredients = ingreds }
+            { model | rationalize = True, newIngredients = ingreds }
 
         ScaleTrue ->
             { model | scale = True }
-        
-        Rationalize num rat -> 
+
+        Rationalize num rat ->
             let
-                multiplier = getMultiplier model.ingredients num rat 
+                multiplier =
+                    getMultiplier model.ingredients num rat
             in
-                {model | newIngredients = mapIngredients model.newIngredients model.ingredients multiplier 0}
+            { model | newIngredients = mapIngredients model.newIngredients model.ingredients multiplier 0 }
 
 
 getIngQuant : List Ingredient -> Int -> Float
 getIngQuant lst num =
-        case lst of 
-            [] -> 0.0
-            ing :: ings ->
-                case num of 
-                    0 -> case String.toFloat ing.quantity of 
-                        Just x -> x
-                        Nothing -> 0.0
-                    x -> getIngQuant ings (num - 1)
+    case lst of
+        [] ->
+            0.0
+
+        ing :: ings ->
+            case num of
+                0 ->
+                    case String.toFloat ing.quantity of
+                        Just x ->
+                            x
+
+                        Nothing ->
+                            0.0
+
+                x ->
+                    getIngQuant ings (num - 1)
 
 
-mapIngredients : List Ingredient -> List Ingredient ->  Float -> Int -> List Ingredient
-mapIngredients lst oldIngs flt num = 
-    case lst of 
-        [] -> []
-        ing :: ings -> 
-                {ing | quantity = (String.fromFloat (getIngQuant oldIngs num * flt))} :: mapIngredients ings oldIngs flt (num + 1)
+mapIngredients : List Ingredient -> List Ingredient -> Float -> Int -> List Ingredient
+mapIngredients lst oldIngs flt num =
+    case lst of
+        [] ->
+            []
+
+        ing :: ings ->
+            { ing | quantity = String.fromFloat (getIngQuant oldIngs num * flt) } :: mapIngredients ings oldIngs flt (num + 1)
 
 
 newRecipe : List Ingredient -> List Ingredient
-newRecipe lst = 
-    case lst of 
-        [] -> []
-        ing :: ings ->
-            {ing | quantity = ""} :: newRecipe ings
+newRecipe lst =
+    case lst of
+        [] ->
+            []
 
+        ing :: ings ->
+            { ing | quantity = "" } :: newRecipe ings
 
 
 getMultiplier : List Ingredient -> Int -> String -> Float
-getMultiplier lst num rat = 
-    case String.toFloat rat of 
-        Just x -> 
-            case num of 
-                0 -> 
-                    case lst of 
-                        [] -> 1.0
-                        ing :: ings -> 
-                            case String.toFloat ing.quantity of 
-                                Just y -> x/y 
-                                Nothing -> 1.0
+getMultiplier lst num rat =
+    case String.toFloat rat of
+        Just x ->
+            case num of
+                0 ->
+                    case lst of
+                        [] ->
+                            1.0
 
-                z -> getMultiplier lst (num - 1) rat 
-        Nothing -> 1.0
+                        ing :: ings ->
+                            case String.toFloat ing.quantity of
+                                Just y ->
+                                    x / y
 
+                                Nothing ->
+                                    1.0
+
+                z ->
+                    getMultiplier lst (num - 1) rat
+
+        Nothing ->
+            1.0
 
 
 areIngredientsFilled : List Ingredient -> Bool -> Bool
@@ -301,14 +321,14 @@ view model =
                 )
 
 
-buttonIngredients : List Ingredient -> Int ->  List (Html Msg)
+buttonIngredients : List Ingredient -> Int -> List (Html Msg)
 buttonIngredients lst numb =
     case lst of
         [] ->
             []
 
         ing :: ings ->
-            div [] [ text ing.food, input [value ing.quantity, onInput (Rationalize numb)] [] ] :: buttonIngredients ings (numb + 1)
+            div [] [ text ing.food, input [ value ing.quantity, onInput (Rationalize numb) ] [] ] :: buttonIngredients ings (numb + 1)
 
 
 listIngredients : List Ingredient -> List (Html Msg)
