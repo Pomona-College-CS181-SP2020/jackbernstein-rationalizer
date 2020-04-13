@@ -34,3 +34,11 @@ Problem: Build fails while trying to install elm
 
 Fix: TBD
 
+# 4-13-2020
+
+Problem: Can't go back to 0 when rationalizing
+
+Fix: TBD
+
+
+
