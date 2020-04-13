@@ -69,6 +69,7 @@ type Msg
     | RationalizeTrue
     | ScaleTrue
     | Rationalize Int String
+    | Scale Float
 
 
 update : Msg -> Model -> Model
@@ -104,7 +105,7 @@ update msg model =
             { model | rationalize = True, newIngredients = ingreds }
 
         ScaleTrue ->
-            { model | scale = True }
+            { model | scale = True, newIngredients = model.ingredients }
 
         Rationalize num rat ->
             let
@@ -112,6 +113,10 @@ update msg model =
                     getMultiplier model.ingredients num rat
             in
             { model | newIngredients = mapIngredients model.newIngredients model.ingredients multiplier 0 }
+
+        Scale flt ->
+            { model | newIngredients = mapIngredients model.newIngredients model.ingredients flt 0 }
+        
 
 
 getIngQuant : List Ingredient -> Int -> Float
@@ -288,7 +293,7 @@ view model =
             case model.rationalize of
                 True ->
                     div []
-                        ([ div [] [ text "Select an ingredient to rationalize " ]
+                        ([ h1 [] [ text "Rationalize Ingredients " ]
                          ]
                             ++ buttonIngredients model.newIngredients 0
                         )
@@ -296,7 +301,13 @@ view model =
                 False ->
                     case model.scale of
                         True ->
-                            div [] []
+                            div [] 
+                                    ([h1 [] [ text "Scale Ingredients"]
+                                    , div [] [button [ onClick (Scale 0.5)] [text "Halve"], button [ onClick (Scale 1)] [text "Original"], button [ onClick (Scale 2)] [text "Double"]] 
+                                    ]
+                                        ++ listIngredients model.newIngredients
+                                    )
+                                
 
                         False ->
                             div []
