@@ -322,7 +322,6 @@ view model =
         False ->
             div []
                 ([ h1 [] [ text "Secret Krabby Patty Formula" ]
-                 , img [ src "burger.jpg", style "height" "90px", style "width" "160px" ] []
                  , div [] [ text "Add ingredients!" ]
                  , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
                  ]

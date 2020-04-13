@@ -1,0 +1,14 @@
+body {
+    color: white;
+    background-image: url("/burger.jpg");
+    background-repeat: no-repeat;
+  }
+  
+  h1 {
+    color: white;
+    margin-left: 20px;
+  }
+
+  text {
+      color: white;
+  }
