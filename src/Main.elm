@@ -70,6 +70,9 @@ type Msg
     | ScaleTrue
     | Rationalize Int String
     | Scale Float
+    | Back
+    | BackRationalize
+    | BackScale
 
 
 update : Msg -> Model -> Model
@@ -116,7 +119,15 @@ update msg model =
 
         Scale flt ->
             { model | newIngredients = mapIngredients model.newIngredients model.ingredients flt 0 }
-        
+
+        Back ->
+            { model | complete = False, submitError = False }
+
+        BackRationalize ->
+            { model | rationalize = False}
+
+        BackScale -> 
+            { model | scale = False }
 
 
 getIngQuant : List Ingredient -> Int -> Float
@@ -296,18 +307,19 @@ view model =
                         ([ h1 [] [ text "Rationalize Ingredients " ]
                          ]
                             ++ buttonIngredients model.newIngredients 0
+                            ++ [ button [ onClick BackRationalize ] [text "Back"]]
                         )
 
                 False ->
                     case model.scale of
                         True ->
-                            div [] 
-                                    ([h1 [] [ text "Scale Ingredients"]
-                                    , div [] [button [ onClick (Scale 0.5)] [text "Halve"], button [ onClick (Scale 1)] [text "Original"], button [ onClick (Scale 2)] [text "Double"]] 
-                                    ]
-                                        ++ listIngredients model.newIngredients
-                                    )
-                                
+                            div []
+                                ([ h1 [] [ text "Scale Ingredients" ]
+                                 , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
+                                 ]
+                                    ++ listIngredients model.newIngredients
+                                    ++ [ button [ onClick BackScale ] [text "Back" ]]
+                                )
 
                         False ->
                             div []
@@ -316,7 +328,11 @@ view model =
                                 , ol [] (listIngredients model.ingredients)
                                 , div [] [ text """Would you like to select an ingredient, input a quantity, and build the new recipe around it, or would you 
                                                 like to scale all the ingredients?""" ]
-                                , div [] [ button [ onClick RationalizeTrue ] [ text "Select ingredient" ], button [ onClick ScaleTrue ] [ text "scale" ] ]
+                                , div []
+                                    [ button [ onClick RationalizeTrue ] [ text "Select ingredient" ]
+                                    , button [ onClick ScaleTrue ] [ text "scale" ]
+                                    , button [ onClick Back ] [ text "Back" ]
+                                    ]
                                 ]
 
         False ->
