@@ -73,6 +73,7 @@ type Msg
     | Back
     | BackRationalize
     | BackScale
+    | Reset
 
 
 update : Msg -> Model -> Model
@@ -128,6 +129,9 @@ update msg model =
 
         BackScale -> 
             { model | scale = False }
+
+        Reset -> 
+            init
 
 
 getIngQuant : List Ingredient -> Int -> Float
@@ -308,6 +312,7 @@ view model =
                          ]
                             ++ buttonIngredients model.newIngredients 0
                             ++ [ button [ onClick BackRationalize ] [text "Back"]]
+                            ++ [button [ onClick Reset] [text "Start Over"]]
                         )
 
                 False ->
@@ -318,7 +323,9 @@ view model =
                                  , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
                                  ]
                                     ++ listIngredients model.newIngredients
-                                    ++ [ button [ onClick BackScale ] [text "Back" ]]
+                                    ++ [ button [ onClick BackScale ] [text "Back" ]
+                                       , button [ onClick Reset] [text "Reset" ] 
+                                       ]
                                 )
 
                         False ->

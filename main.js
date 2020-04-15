@@ -5626,19 +5626,37 @@ var $author$project$Main$update = F2(
 					{
 						newIngredients: A4($author$project$Main$mapIngredients, model.newIngredients, model.ingredients, multiplier, 0)
 					});
-			default:
+			case 'Scale':
 				var flt = msg.a;
 				return _Utils_update(
 					model,
 					{
 						newIngredients: A4($author$project$Main$mapIngredients, model.newIngredients, model.ingredients, flt, 0)
 					});
+			case 'Back':
+				return _Utils_update(
+					model,
+					{complete: false, submitError: false});
+			case 'BackRationalize':
+				return _Utils_update(
+					model,
+					{rationalize: false});
+			case 'BackScale':
+				return _Utils_update(
+					model,
+					{scale: false});
+			default:
+				return $author$project$Main$init;
 		}
 	});
 var $author$project$Main$AddFood = {$: 'AddFood'};
+var $author$project$Main$Back = {$: 'Back'};
+var $author$project$Main$BackRationalize = {$: 'BackRationalize'};
+var $author$project$Main$BackScale = {$: 'BackScale'};
 var $author$project$Main$DeleteFood = {$: 'DeleteFood'};
 var $author$project$Main$RationalizeTrue = {$: 'RationalizeTrue'};
 var $author$project$Main$RecipeDone = {$: 'RecipeDone'};
+var $author$project$Main$Reset = {$: 'Reset'};
 var $author$project$Main$Scale = function (a) {
 	return {$: 'Scale', a: a};
 };
@@ -5860,7 +5878,35 @@ var $author$project$Main$view = function (model) {
 									$elm$html$Html$text('Rationalize Ingredients ')
 								]))
 						]),
-					A2($author$project$Main$buttonIngredients, model.newIngredients, 0)));
+					_Utils_ap(
+						A2($author$project$Main$buttonIngredients, model.newIngredients, 0),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick($author$project$Main$BackRationalize)
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Back')
+										]))
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick($author$project$Main$Reset)
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Start Over')
+										]))
+								])))));
 		} else {
 			var _v2 = model.scale;
 			if (_v2) {
@@ -5917,7 +5963,31 @@ var $author$project$Main$view = function (model) {
 											]))
 									]))
 							]),
-						$author$project$Main$listIngredients(model.newIngredients)));
+						_Utils_ap(
+							$author$project$Main$listIngredients(model.newIngredients),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick($author$project$Main$BackScale)
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Back')
+										])),
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick($author$project$Main$Reset)
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Reset')
+										]))
+								]))));
 			} else {
 				return A2(
 					$elm$html$Html$div,
@@ -5973,6 +6043,16 @@ var $author$project$Main$view = function (model) {
 									_List_fromArray(
 										[
 											$elm$html$Html$text('scale')
+										])),
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick($author$project$Main$Back)
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Back')
 										]))
 								]))
 						]));
