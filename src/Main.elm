@@ -125,12 +125,12 @@ update msg model =
             { model | complete = False, submitError = False }
 
         BackRationalize ->
-            { model | rationalize = False}
+            { model | rationalize = False }
 
-        BackScale -> 
+        BackScale ->
             { model | scale = False }
 
-        Reset -> 
+        Reset ->
             init
 
 
@@ -311,8 +311,8 @@ view model =
                         ([ h1 [] [ text "Rationalize Ingredients " ]
                          ]
                             ++ buttonIngredients model.newIngredients 0
-                            ++ [ button [ onClick BackRationalize ] [text "Back"]]
-                            ++ [button [ onClick Reset] [text "Start Over"]]
+                            ++ [ button [ onClick BackRationalize ] [ text "Back" ] ]
+                            ++ [ button [ onClick Reset ] [ text "Start Over" ] ]
                         )
 
                 False ->
@@ -323,8 +323,8 @@ view model =
                                  , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
                                  ]
                                     ++ listIngredients model.newIngredients
-                                    ++ [ button [ onClick BackScale ] [text "Back" ]
-                                       , button [ onClick Reset] [text "Reset" ] 
+                                    ++ [ button [ onClick BackScale ] [ text "Back" ]
+                                       , button [ onClick Reset ] [ text "Reset" ]
                                        ]
                                 )
 
