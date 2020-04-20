@@ -1,5 +1,5 @@
 language: 
   - elm
   - node_js
-elm: 0.18.0
+elm: 0.19.1
 node: "10"
