@@ -23,24 +23,4 @@ suite =
                         Expect.equal Main.init.complete False
                 ]
             ]
-        , describe "Main.view"
-            [ describe "Main.view.inital"
-                [ test "Add ingredients button exists" <|
-                    \_ ->
-                        Main.view Main.init
-                            |> Query.fromHtml
-                            |> Query.has [ tag "button", text "Add another ingredient" ]
-                , test "Remove ingredients button exists" <|
-                    \_ ->
-                        Main.view Main.init
-                            |> Query.fromHtml
-                            |> Query.has [ tag "button", text "Remove ingredient" ]
-                , test "Three input fields" <|
-                    \_ ->
-                        Main.view Main.init
-                            |> Query.fromHtml
-                            |> Query.findAll [ tag "input" ]
-                            |> Query.count (Expect.equal 3)
-                ]
-            ]
         ]
