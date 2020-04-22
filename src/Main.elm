@@ -303,68 +303,84 @@ updateUnits lst num newUnit =
 
 view : Model -> Html Msg
 view model =
-    case model.complete of
-        True ->
-            case model.rationalize of
-                True ->
-                    div []
-                        ([ h1 [] [ text "Rationalize Ingredients " ]
-                         ]
-                            ++ buttonIngredients model.newIngredients 0
-                            ++ [ button [ onClick BackRationalize ] [ text "Back" ] ]
-                            ++ [ button [ onClick Reset ] [ text "Start Over" ] ]
-                        )
+    div [ class "row" ]
+        [ div [ class "column" ]
+            ([ h1 [] [ text "OG recipe" ]
+             , div [] [ text "Add ingredients!" ]
+             , div []
+                [ input [ placeholder "Ingredient" ] []
+                , input [ placeholder "Quantity" ] []
+                , input [ placeholder "Units (optional)" ] []
+                ]
+             ]
+                ++ viewIngredients model.ingredients 0
+            )
+        , div [ class "column" ] []
+        ]
 
-                False ->
-                    case model.scale of
-                        True ->
-                            div []
-                                ([ h1 [] [ text "Scale Ingredients" ]
-                                 , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
-                                 ]
-                                    ++ listIngredients model.newIngredients
-                                    ++ [ button [ onClick BackScale ] [ text "Back" ]
-                                       , button [ onClick Reset ] [ text "Reset" ]
-                                       ]
-                                )
 
-                        False ->
-                            div [class "row"] [
-                                div [class "column"]
-                                        ([ h1 [] [ text "Secret Krabby Patty Formula" ]
-                                    , div [] [ text "Add ingredients!" ]
-                                    , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
-                                        ]
-                                        ++ viewIngredients model.ingredients 0
-                                        ++ [ button [ onClick RecipeDone ] [ text "Submit Formula" ] ]
-                                        ++ errorMessage model
-                                    )
-                                , div [class "column"]
-                                    [ h1 [] [ text "Time to Rationalize!" ]
-                                    , div [] [ text "This is your recipe" ]
-                                    , ol [] (listIngredients model.ingredients)
-                                    , div [] [ text """Would you like to select an ingredient, input a quantity, and build the new recipe around it, or would you 
-                                                    like to scale all the ingredients?""" ]
-                                    , div []
-                                        [ button [ onClick RationalizeTrue ] [ text "Select ingredient" ]
-                                        , button [ onClick ScaleTrue ] [ text "scale" ]
-                                        , button [ onClick Back ] [ text "Back" ]
-                                        ]
-                                    ]
-                            ]
 
-        False ->
-            div [class "row"] [
-                div [class "column"]
-                    ([ h1 [] [ text "Secret Krabby Patty Formula" ]
-                 , div [] [ text "Add ingredients!" ]
-                 , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
-                    ]
-                    ++ viewIngredients model.ingredients 0
-                    ++ [ button [ onClick RecipeDone ] [ text "Submit Formula" ] ]
-                    ++ errorMessage model
-                )
-            ]
+-- view2 : Model -> Html Msg
+-- view2 model =
+--     case model.complete of
+--         True ->
+--             case model.rationalize of
+--                 True ->
+--                     div []
+--                         ([ h1 [] [ text "Rationalize Ingredients " ]
+--                          ]
+--                             ++ buttonIngredients model.newIngredients 0
+--                             ++ [ button [ onClick BackRationalize ] [ text "Back" ] ]
+--                             ++ [ button [ onClick Reset ] [ text "Start Over" ] ]
+--                         )
+--                 False ->
+--                     case model.scale of
+--                         True ->
+--                             div []
+--                                 ([ h1 [] [ text "Scale Ingredients" ]
+--                                  , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
+--                                  ]
+--                                     ++ listIngredients model.newIngredients
+--                                     ++ [ button [ onClick BackScale ] [ text "Back" ]
+--                                        , button [ onClick Reset ] [ text "Reset" ]
+--                                        ]
+--                                 )
+--                         False ->
+--                             div [ class "row" ]
+--                                 [ div [ class "column" ]
+--                                     ([ h1 [] [ text "Secret Krabby Patty Formula" ]
+--                                      , div [] [ text "Add ingredients!" ]
+--                                      , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
+--                                      ]
+--                                         ++ viewIngredients model.ingredients 0
+--                                         ++ [ button [ onClick RecipeDone ] [ text "Submit Formula" ] ]
+--                                         ++ errorMessage model
+--                                     )
+--                                 , div [ class "column" ]
+--                                     [ h1 [] [ text "Time to Rationalize!" ]
+--                                     , div [] [ text "This is your recipe" ]
+--                                     , ol [] (listIngredients model.ingredients)
+--                                     , div [] [ text """Would you like to select an ingredient, input a quantity, and build the new recipe around it, or would you
+--                                                     like to scale all the ingredients?""" ]
+--                                     , div []
+--                                         [ button [ onClick RationalizeTrue ] [ text "Select ingredient" ]
+--                                         , button [ onClick ScaleTrue ] [ text "scale" ]
+--                                         , button [ onClick Back ] [ text "Back" ]
+--                                         ]
+--                                     ]
+--                                 ]
+--         False ->
+--             div [ class "row" ]
+--                 [ div [ class "column" ]
+--                     ([ h1 [] [ text "Secret Krabby Patty Formula" ]
+--                      , div [] [ text "Add ingredients!" ]
+--                      , div [] [ button [ onClick AddFood ] [ text "Add another ingredient" ], button [ onClick DeleteFood ] [ text "Remove ingredient" ] ]
+--                      ]
+--                         ++ viewIngredients model.ingredients 0
+--                         ++ [ button [ onClick RecipeDone ] [ text "Submit Formula" ] ]
+--                         ++ errorMessage model
+--                     )
+--                 ]
 
 
 buttonIngredients : List Ingredient -> Int -> List (Html Msg)
@@ -405,9 +421,9 @@ viewIngredients lst num =
 
         food :: foods ->
             [ div []
-                [ input [ placeholder "Ingredient", value food.food, onInput (Food num) ] []
-                , input [ placeholder "Quantity", value food.quantity, onInput (Quantity num) ] []
-                , input [ placeholder "Units (optional)", value food.unit, onInput (Unit num) ] []
+                [ text food.quantity
+                , text food.unit
+                , text food.food
                 ]
             ]
                 ++ viewIngredients foods (num + 1)
