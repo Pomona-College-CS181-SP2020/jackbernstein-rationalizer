@@ -4436,17 +4436,7 @@ var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$Basics$False = {$: 'False'};
-var $author$project$Main$init = {
-	complete: false,
-	ingredients: _List_fromArray(
-		[
-			{food: '', quantity: '', unit: ''}
-		]),
-	newIngredients: _List_Nil,
-	rationalize: false,
-	scale: false,
-	submitError: false
-};
+var $author$project$Main$init = {complete: false, ingredients: _List_Nil, newIngredients: _List_Nil, rationalize: false, scale: false, submitError: false, tempFood: '', tempQuant: '', tempUnit: ''};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -5552,6 +5542,38 @@ var $author$project$Main$updateUnits = F3(
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
+			case 'AddToList':
+				var ing = msg.a;
+				return _Utils_update(
+					model,
+					{
+						ingredients: _Utils_ap(
+							model.ingredients,
+							_List_fromArray(
+								[ing])),
+						newIngredients: _Utils_ap(
+							model.newIngredients,
+							_List_fromArray(
+								[ing])),
+						tempFood: '',
+						tempQuant: '',
+						tempUnit: ''
+					});
+			case 'ChangeTempFood':
+				var food = msg.a;
+				return _Utils_update(
+					model,
+					{tempFood: food});
+			case 'ChangeTempQuant':
+				var quant = msg.a;
+				return _Utils_update(
+					model,
+					{tempQuant: quant});
+			case 'ChangeTempUnit':
+				var unit = msg.a;
+				return _Utils_update(
+					model,
+					{tempUnit: unit});
 			case 'Food':
 				var num = msg.a;
 				var newFood = msg.b;
@@ -5649,6 +5671,22 @@ var $author$project$Main$update = F2(
 				return $author$project$Main$init;
 		}
 	});
+var $author$project$Main$AddToList = function (a) {
+	return {$: 'AddToList', a: a};
+};
+var $author$project$Main$ChangeTempFood = function (a) {
+	return {$: 'ChangeTempFood', a: a};
+};
+var $author$project$Main$ChangeTempQuant = function (a) {
+	return {$: 'ChangeTempQuant', a: a};
+};
+var $author$project$Main$ChangeTempUnit = function (a) {
+	return {$: 'ChangeTempUnit', a: a};
+};
+var $author$project$Main$Scale = function (a) {
+	return {$: 'Scale', a: a};
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5660,33 +5698,93 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$viewIngredients = F2(
-	function (lst, num) {
-		if (!lst.b) {
-			return _List_Nil;
-		} else {
-			var food = lst.a;
-			var foods = lst.b;
-			return _Utils_ap(
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(food.quantity),
-								$elm$html$Html$text(food.unit),
-								$elm$html$Html$text(food.food)
-							]))
-					]),
-				A2($author$project$Main$viewIngredients, foods, num + 1));
-		}
-	});
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$viewIngredients = function (lst) {
+	if (!lst.b) {
+		return _List_Nil;
+	} else {
+		var food = lst.a;
+		var foods = lst.b;
+		return $elm$core$String$isEmpty(food.unit) ? _Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(food.quantity + (', ' + food.food))
+						]))
+				]),
+			$author$project$Main$viewIngredients(foods)) : _Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(food.quantity + (' ' + (food.unit + (' of ' + food.food))))
+						]))
+				]),
+			$author$project$Main$viewIngredients(foods));
+	}
+};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -5728,33 +5826,108 @@ var $author$project$Main$view = function (model) {
 									$elm$html$Html$input,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$placeholder('Ingredient')
+											$elm$html$Html$Attributes$placeholder('Quantity'),
+											$elm$html$Html$Attributes$value(model.tempQuant),
+											$elm$html$Html$Events$onInput($author$project$Main$ChangeTempQuant)
 										]),
 									_List_Nil),
 									A2(
 									$elm$html$Html$input,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$placeholder('Quantity')
+											$elm$html$Html$Attributes$placeholder('Units (optional)'),
+											$elm$html$Html$Attributes$value(model.tempUnit),
+											$elm$html$Html$Events$onInput($author$project$Main$ChangeTempUnit)
 										]),
 									_List_Nil),
 									A2(
 									$elm$html$Html$input,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$placeholder('Units (optional)')
+											$elm$html$Html$Attributes$placeholder('Ingredient'),
+											$elm$html$Html$Attributes$value(model.tempFood),
+											$elm$html$Html$Events$onInput($author$project$Main$ChangeTempFood)
 										]),
 									_List_Nil)
+								])),
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$AddToList(
+										{food: model.tempFood, quantity: model.tempQuant, unit: model.tempUnit}))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Add Ingredient')
 								]))
 						]),
-					A2($author$project$Main$viewIngredients, model.ingredients, 0))),
+					$author$project$Main$viewIngredients(model.ingredients))),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class('column')
 					]),
-				_List_Nil)
+				_Utils_ap(
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h1,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Time to rationalize this recipe into oblivion')
+								])),
+							A2(
+							$elm$html$Html$h2,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('New recipe')
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick(
+											$author$project$Main$Scale(0.5))
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Halve')
+										])),
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick(
+											$author$project$Main$Scale(1))
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Original')
+										])),
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onClick(
+											$author$project$Main$Scale(2))
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Double')
+										]))
+								]))
+						]),
+					$author$project$Main$viewIngredients(model.newIngredients)))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(

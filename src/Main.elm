@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Attribute, Html, button, div, h1, img, input, li, ol, text)
+import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 
@@ -32,6 +32,9 @@ type alias Recipe =
     , rationalize : Bool
     , scale : Bool
     , newIngredients : List Ingredient
+    , tempFood : String
+    , tempQuant : String
+    , tempUnit : String
     }
 
 
@@ -41,17 +44,15 @@ type alias Model =
 
 init : Model
 init =
-    { ingredients =
-        [ { food = ""
-          , quantity = ""
-          , unit = ""
-          }
-        ]
+    { ingredients = []
     , complete = False
     , submitError = False
     , rationalize = False
     , scale = False
     , newIngredients = []
+    , tempFood = ""
+    , tempQuant = ""
+    , tempUnit = ""
     }
 
 
@@ -74,11 +75,27 @@ type Msg
     | BackRationalize
     | BackScale
     | Reset
+    | ChangeTempFood String
+    | ChangeTempQuant String
+    | ChangeTempUnit String
+    | AddToList Ingredient
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
+        AddToList ing ->
+            { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", newIngredients = model.newIngredients ++ [ ing ]}
+
+        ChangeTempFood food ->
+            { model | tempFood = food }
+
+        ChangeTempQuant quant ->
+            { model | tempQuant = quant }
+
+        ChangeTempUnit unit ->
+            { model | tempUnit = unit }
+
         Food num newFood ->
             { model | ingredients = updateFood model.ingredients num newFood, submitError = False }
 
@@ -308,14 +325,19 @@ view model =
             ([ h1 [] [ text "OG recipe" ]
              , div [] [ text "Add ingredients!" ]
              , div []
-                [ input [ placeholder "Ingredient" ] []
-                , input [ placeholder "Quantity" ] []
-                , input [ placeholder "Units (optional)" ] []
+                [ input [ placeholder "Quantity", value model.tempQuant, onInput ChangeTempQuant ] []
+                , input [ placeholder "Units (optional)", value model.tempUnit, onInput ChangeTempUnit ] []
+                , input [ placeholder "Ingredient", value model.tempFood, onInput ChangeTempFood ] []
                 ]
+             , button [ onClick (AddToList { food = model.tempFood, quantity = model.tempQuant, unit = model.tempUnit }) ] [ text "Add Ingredient" ]
              ]
-                ++ viewIngredients model.ingredients 0
+                ++ viewIngredients model.ingredients
             )
-        , div [ class "column" ] []
+        , div [ class "column" ]
+            ([ h1 [] [ text "Time to rationalize this recipe into oblivion" ]
+            , h2 [] [ text "New recipe" ]
+            , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
+            ] ++ viewIngredients model.newIngredients)
         ]
 
 
@@ -413,17 +435,23 @@ errorMessage model =
             []
 
 
-viewIngredients : List Ingredient -> Int -> List (Html Msg)
-viewIngredients lst num =
+viewIngredients : List Ingredient -> List (Html Msg)
+viewIngredients lst =
     case lst of
         [] ->
             []
 
         food :: foods ->
-            [ div []
-                [ text food.quantity
-                , text food.unit
-                , text food.food
+            if String.isEmpty food.unit then
+                [ div []
+                    [ text (food.quantity ++ ", " ++ food.food)
+                    ]
                 ]
-            ]
-                ++ viewIngredients foods (num + 1)
+                    ++ viewIngredients foods
+
+            else
+                [ div []
+                    [ text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food)
+                    ]
+                ]
+                    ++ viewIngredients foods
