@@ -85,7 +85,7 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         AddToList ing ->
-            { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", newIngredients = model.newIngredients ++ [ ing ]}
+            verifyAdd model ing
 
         ChangeTempFood food ->
             { model | tempFood = food }
@@ -149,6 +149,15 @@ update msg model =
 
         Reset ->
             init
+
+verifyAdd : Model -> Ingredient -> Model
+verifyAdd model ing =
+    if String.isEmpty ing.food 
+    then model 
+    else 
+        case String.toFloat ing.quantity of 
+        Nothing -> model
+        Just x ->  { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", newIngredients = model.newIngredients ++ [ ing ]}
 
 
 getIngQuant : List Ingredient -> Int -> Float

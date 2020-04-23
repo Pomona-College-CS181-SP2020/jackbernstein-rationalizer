@@ -5539,11 +5539,16 @@ var $author$project$Main$updateUnits = F3(
 			}
 		}
 	});
-var $author$project$Main$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'AddToList':
-				var ing = msg.a;
+var $author$project$Main$verifyAdd = F2(
+	function (model, ing) {
+		if ($elm$core$String$isEmpty(ing.food)) {
+			return model;
+		} else {
+			var _v0 = $elm$core$String$toFloat(ing.quantity);
+			if (_v0.$ === 'Nothing') {
+				return model;
+			} else {
+				var x = _v0.a;
 				return _Utils_update(
 					model,
 					{
@@ -5559,6 +5564,15 @@ var $author$project$Main$update = F2(
 						tempQuant: '',
 						tempUnit: ''
 					});
+			}
+		}
+	});
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'AddToList':
+				var ing = msg.a;
+				return A2($author$project$Main$verifyAdd, model, ing);
 			case 'ChangeTempFood':
 				var food = msg.a;
 				return _Utils_update(
