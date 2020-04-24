@@ -37,6 +37,7 @@ type alias Recipe =
     , tempUnit : String
     , optionIng : Ingredient
     , optionFood : String
+    , optionNumb : String
     }
 
 
@@ -55,12 +56,13 @@ init =
     , tempFood = ""
     , tempQuant = ""
     , tempUnit = ""
-    , optionIng = {
-        food = ""
+    , optionIng =
+        { food = ""
         , quantity = ""
         , unit = ""
-    }
+        }
     , optionFood = ""
+    , optionNumb = ""
     }
 
 
@@ -95,15 +97,19 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         NewRationalize strng ->
-            case String.toFloat strng of 
-                Nothing -> model
-                Just x -> 
-                    rationalizeIngs model strng
+            case String.toFloat strng of
+                Nothing ->
+                    model
+
+                Just x ->
+                    { model | optionNumb = strng }
 
         SetOption strng ->
-            if strng == "Select an Ingredient"
-            then {model | optionFood = ""}
-            else {model | optionFood = strng}
+            if strng == "Select an Ingredient" then
+                { model | optionFood = "" }
+
+            else
+                { model | optionFood = strng }
 
         AddToList ing ->
             verifyAdd model ing
@@ -171,20 +177,30 @@ update msg model =
         Reset ->
             init
 
-rationalizeIngs : Model -> String -> Model 
-rationalizeIngs model strng = model
-    -- if String.isEmpty model.optionIng.food
-    -- then { model | optionNumb = strng }
-    -- else {model | optionNumb = strng}
+
+rationalizeIngs : Model -> String -> Model
+rationalizeIngs model strng =
+    model
+
+
+
+-- if String.isEmpty model.optionIng.food
+-- then { model | optionNumb = strng }
+-- else {model | optionNumb = strng}
+
 
 verifyAdd : Model -> Ingredient -> Model
 verifyAdd model ing =
-    if String.isEmpty ing.food 
-    then model 
-    else 
-        case String.toFloat ing.quantity of 
-        Nothing -> model
-        Just x ->  { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", newIngredients = model.newIngredients ++ [ ing ]}
+    if String.isEmpty ing.food then
+        model
+
+    else
+        case String.toFloat ing.quantity of
+            Nothing ->
+                model
+
+            Just x ->
+                { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", newIngredients = model.newIngredients ++ [ ing ] }
 
 
 getIngQuant : List Ingredient -> Int -> Float
@@ -371,23 +387,27 @@ view model =
             )
         , div [ class "column" ]
             ([ h1 [] [ text "Time to rationalize this recipe into oblivion" ]
-            , h2 [] [ text "New recipe" ]
-            , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
-            , div [] [
-                select [  onInput SetOption] ([option [] [text "Select an Ingredient"]] ++ ingredientOptions model.ingredients)
-                , input [] []
+             , h2 [] [ text "New recipe" ]
+             , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
+             , div []
+                [ select [ onInput SetOption ] ([ option [] [ text "Select an Ingredient" ] ] ++ ingredientOptions model.ingredients)
+                , input [ value model.optionNumb, onInput NewRationalize ] []
                 , text ("foodiefood: " ++ model.optionFood)
-            ]
-            ] ++ viewIngredients model.newIngredients)
+                ]
+             ]
+                ++ viewIngredients model.newIngredients
+            )
         ]
 
-ingredientOptions : List Ingredient -> List (Html Msg) 
-ingredientOptions ings = 
-    case ings of 
+
+ingredientOptions : List Ingredient -> List (Html Msg)
+ingredientOptions ings =
+    case ings of
         [] ->
             []
-        food::foods ->
-            (option [value food.food] [text food.food]) :: ingredientOptions foods 
+
+        food :: foods ->
+            option [ value food.food ] [ text food.food ] :: ingredientOptions foods
 
 
 

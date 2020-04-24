@@ -4442,6 +4442,7 @@ var $author$project$Main$init = {
 	newIngredients: _List_Nil,
 	optionFood: '',
 	optionIng: {food: '', quantity: '', unit: ''},
+	optionNumb: '',
 	rationalize: false,
 	scale: false,
 	submitError: false,
@@ -5311,10 +5312,6 @@ var $author$project$Main$newRecipe = function (lst) {
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
-var $author$project$Main$rationalizeIngs = F2(
-	function (model, strng) {
-		return model;
-	});
 var $elm$core$List$takeReverse = F3(
 	function (n, list, kept) {
 		takeReverse:
@@ -5593,7 +5590,9 @@ var $author$project$Main$update = F2(
 					return model;
 				} else {
 					var x = _v1.a;
-					return A2($author$project$Main$rationalizeIngs, model, strng);
+					return _Utils_update(
+						model,
+						{optionNumb: strng});
 				}
 			case 'SetOption':
 				var strng = msg.a;
@@ -5728,6 +5727,9 @@ var $author$project$Main$ChangeTempQuant = function (a) {
 };
 var $author$project$Main$ChangeTempUnit = function (a) {
 	return {$: 'ChangeTempUnit', a: a};
+};
+var $author$project$Main$NewRationalize = function (a) {
+	return {$: 'NewRationalize', a: a};
 };
 var $author$project$Main$Scale = function (a) {
 	return {$: 'Scale', a: a};
@@ -6021,7 +6023,14 @@ var $author$project$Main$view = function (model) {
 													]))
 											]),
 										$author$project$Main$ingredientOptions(model.ingredients))),
-									A2($elm$html$Html$input, _List_Nil, _List_Nil),
+									A2(
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$value(model.optionNumb),
+											$elm$html$Html$Events$onInput($author$project$Main$NewRationalize)
+										]),
+									_List_Nil),
 									$elm$html$Html$text('foodiefood: ' + model.optionFood)
 								]))
 						]),
