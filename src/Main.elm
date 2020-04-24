@@ -101,7 +101,9 @@ update msg model =
                     rationalizeIngs model strng
 
         SetOption strng ->
-            {model | optionFood = strng}
+            if strng == "Select an Ingredient"
+            then {model | optionFood = ""}
+            else {model | optionFood = strng}
 
         AddToList ing ->
             verifyAdd model ing
@@ -372,8 +374,9 @@ view model =
             , h2 [] [ text "New recipe" ]
             , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
             , div [] [
-                select [onInput SetOption] ([] ++ ingredientOptions model.ingredients)
+                select [  onInput SetOption] ([option [] [text "Select an Ingredient"]] ++ ingredientOptions model.ingredients)
                 , input [] []
+                , text ("foodiefood: " ++ model.optionFood)
             ]
             ] ++ viewIngredients model.newIngredients)
         ]

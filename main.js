@@ -5597,7 +5597,9 @@ var $author$project$Main$update = F2(
 				}
 			case 'SetOption':
 				var strng = msg.a;
-				return _Utils_update(
+				return (strng === 'Select an Ingredient') ? _Utils_update(
+					model,
+					{optionFood: ''}) : _Utils_update(
 					model,
 					{optionFood: strng});
 			case 'AddToList':
@@ -6008,9 +6010,19 @@ var $author$project$Main$view = function (model) {
 											$elm$html$Html$Events$onInput($author$project$Main$SetOption)
 										]),
 									_Utils_ap(
-										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$option,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Select an Ingredient')
+													]))
+											]),
 										$author$project$Main$ingredientOptions(model.ingredients))),
-									A2($elm$html$Html$input, _List_Nil, _List_Nil)
+									A2($elm$html$Html$input, _List_Nil, _List_Nil),
+									$elm$html$Html$text('foodiefood: ' + model.optionFood)
 								]))
 						]),
 					$author$project$Main$viewIngredients(model.newIngredients)))
