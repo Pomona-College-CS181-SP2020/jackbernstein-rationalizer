@@ -15,10 +15,7 @@ suite =
     describe "The Main module"
         [ describe "Main.model"
             [ describe "Main.model.initial"
-                [ test "Initial list has one item" <|
-                    \_ ->
-                        Expect.equal (List.length Main.init.ingredients) 1
-                , test "Inital complete boolean is false" <|
+                [ test "Inital complete boolean is false" <|
                     \_ ->
                         Expect.equal Main.init.complete False
                 ]
