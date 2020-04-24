@@ -5214,6 +5214,27 @@ var $author$project$Main$areIngredientsFilled = F2(
 		}
 	});
 var $elm$core$String$toFloat = _String_toFloat;
+var $author$project$Main$findQuant = F2(
+	function (lst, strng) {
+		findQuant:
+		while (true) {
+			if (!lst.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var ing = lst.a;
+				var ings = lst.b;
+				if (_Utils_eq(ing.food, strng)) {
+					return $elm$core$String$toFloat(ing.quantity);
+				} else {
+					var $temp$lst = ings,
+						$temp$strng = strng;
+					lst = $temp$lst;
+					strng = $temp$strng;
+					continue findQuant;
+				}
+			}
+		}
+	});
 var $author$project$Main$getMultiplier = F3(
 	function (lst, num, rat) {
 		getMultiplier:
@@ -5295,6 +5316,32 @@ var $author$project$Main$mapIngredients = F4(
 							A2($author$project$Main$getIngQuant, oldIngs, num) * flt)
 					}),
 				A4($author$project$Main$mapIngredients, ings, oldIngs, flt, num + 1));
+		}
+	});
+var $author$project$Main$newMapIngredients = F2(
+	function (lst, flt) {
+		if (!lst.b) {
+			return _List_Nil;
+		} else {
+			var food = lst.a;
+			var foods = lst.b;
+			var _v1 = $elm$core$String$toFloat(food.quantity);
+			if (_v1.$ === 'Nothing') {
+				return A2(
+					$elm$core$List$cons,
+					food,
+					A2($author$project$Main$newMapIngredients, foods, flt));
+			} else {
+				var x = _v1.a;
+				return A2(
+					$elm$core$List$cons,
+					_Utils_update(
+						food,
+						{
+							quantity: $elm$core$String$fromFloat(x * flt)
+						}),
+					A2($author$project$Main$newMapIngredients, foods, flt));
+			}
 		}
 	});
 var $author$project$Main$newRecipe = function (lst) {
@@ -5590,17 +5637,28 @@ var $author$project$Main$update = F2(
 					return model;
 				} else {
 					var x = _v1.a;
-					return _Utils_update(
-						model,
-						{optionNumb: strng});
+					var scalr = A2($author$project$Main$findQuant, model.newIngredients, model.optionFood);
+					if (scalr.$ === 'Nothing') {
+						return _Utils_update(
+							model,
+							{optionNumb: strng});
+					} else {
+						var y = scalr.a;
+						return _Utils_update(
+							model,
+							{
+								newIngredients: A2($author$project$Main$newMapIngredients, model.newIngredients, x / y),
+								optionNumb: strng
+							});
+					}
 				}
 			case 'SetOption':
 				var strng = msg.a;
 				return (strng === 'Select an Ingredient') ? _Utils_update(
 					model,
-					{optionFood: ''}) : _Utils_update(
+					{optionFood: '', optionNumb: ''}) : _Utils_update(
 					model,
-					{optionFood: strng});
+					{optionFood: strng, optionNumb: ''});
 			case 'AddToList':
 				var ing = msg.a;
 				return A2($author$project$Main$verifyAdd, model, ing);
@@ -5842,7 +5900,7 @@ var $author$project$Main$viewIngredients = function (lst) {
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(food.quantity + (', ' + food.food))
+							$elm$html$Html$text(food.quantity + (' ' + food.food))
 						]))
 				]),
 			$author$project$Main$viewIngredients(foods)) : _Utils_ap(
@@ -5952,7 +6010,7 @@ var $author$project$Main$view = function (model) {
 							_List_Nil,
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Time to rationalize this recipe into oblivion')
+									$elm$html$Html$text('Time to rationalize ')
 								])),
 							A2(
 							$elm$html$Html$h2,
@@ -6030,8 +6088,7 @@ var $author$project$Main$view = function (model) {
 											$elm$html$Html$Attributes$value(model.optionNumb),
 											$elm$html$Html$Events$onInput($author$project$Main$NewRationalize)
 										]),
-									_List_Nil),
-									$elm$html$Html$text('foodiefood: ' + model.optionFood)
+									_List_Nil)
 								]))
 						]),
 					$author$project$Main$viewIngredients(model.newIngredients)))

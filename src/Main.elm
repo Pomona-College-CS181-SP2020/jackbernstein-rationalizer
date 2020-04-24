@@ -102,14 +102,23 @@ update msg model =
                     model
 
                 Just x ->
-                    { model | optionNumb = strng }
+                    let
+                        scalr =
+                            findQuant model.newIngredients model.optionFood
+                    in
+                    case scalr of
+                        Nothing ->
+                            { model | optionNumb = strng }
+
+                        Just y ->
+                            { model | newIngredients = newMapIngredients model.newIngredients (x / y), optionNumb = strng }
 
         SetOption strng ->
             if strng == "Select an Ingredient" then
-                { model | optionFood = "" }
+                { model | optionFood = "", optionNumb = "" }
 
             else
-                { model | optionFood = strng }
+                { model | optionFood = strng, optionNumb = "" }
 
         AddToList ing ->
             verifyAdd model ing
@@ -178,6 +187,20 @@ update msg model =
             init
 
 
+findQuant : List Ingredient -> String -> Maybe Float
+findQuant lst strng =
+    case lst of
+        [] ->
+            Nothing
+
+        ing :: ings ->
+            if ing.food == strng then
+                String.toFloat ing.quantity
+
+            else
+                findQuant ings strng
+
+
 rationalizeIngs : Model -> String -> Model
 rationalizeIngs model strng =
     model
@@ -221,6 +244,21 @@ getIngQuant lst num =
 
                 x ->
                     getIngQuant ings (num - 1)
+
+
+newMapIngredients : List Ingredient -> Float -> List Ingredient
+newMapIngredients lst flt =
+    case lst of
+        [] ->
+            []
+
+        food :: foods ->
+            case String.toFloat food.quantity of
+                Nothing ->
+                    food :: newMapIngredients foods flt
+
+                Just x ->
+                    { food | quantity = String.fromFloat (x * flt) } :: newMapIngredients foods flt
 
 
 mapIngredients : List Ingredient -> List Ingredient -> Float -> Int -> List Ingredient
@@ -386,13 +424,12 @@ view model =
                 ++ viewIngredients model.ingredients
             )
         , div [ class "column" ]
-            ([ h1 [] [ text "Time to rationalize this recipe into oblivion" ]
+            ([ h1 [] [ text "Time to rationalize " ]
              , h2 [] [ text "New recipe" ]
              , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
              , div []
                 [ select [ onInput SetOption ] ([ option [] [ text "Select an Ingredient" ] ] ++ ingredientOptions model.ingredients)
                 , input [ value model.optionNumb, onInput NewRationalize ] []
-                , text ("foodiefood: " ++ model.optionFood)
                 ]
              ]
                 ++ viewIngredients model.newIngredients
@@ -513,7 +550,7 @@ viewIngredients lst =
         food :: foods ->
             if String.isEmpty food.unit then
                 [ div []
-                    [ text (food.quantity ++ ", " ++ food.food)
+                    [ text (food.quantity ++ " " ++ food.food)
                     ]
                 ]
                     ++ viewIngredients foods
