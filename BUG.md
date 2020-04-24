@@ -33,11 +33,29 @@ Fix: Changed boolean logic to string logic
 
 Problem: Build fails while trying to install elm
 
-Fix: TBD
+Fix: Switched to Elm 0.19.0, Node 9
 
 # 4-13-2020
 
 Problem: Can't go back to 0 when rationalizing
+
+Fix: TBD
+
+# 4-24-2020
+
+Problem: Input won't reset to 0 when select is changed 
+
+Fix: TBD
+
+# 4-24-2020
+
+Problem: Drop down menu is not calling methods in update
+
+Fix: Moved method call from option to select
+
+# 4-24-2020
+
+Problem: Bugs when selecting ingredient to rationalize around
 
 Fix: TBD
 

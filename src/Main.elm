@@ -35,6 +35,8 @@ type alias Recipe =
     , tempFood : String
     , tempQuant : String
     , tempUnit : String
+    , optionIng : Ingredient
+    , optionFood : String
     }
 
 
@@ -53,6 +55,12 @@ init =
     , tempFood = ""
     , tempQuant = ""
     , tempUnit = ""
+    , optionIng = {
+        food = ""
+        , quantity = ""
+        , unit = ""
+    }
+    , optionFood = ""
     }
 
 
@@ -79,11 +87,22 @@ type Msg
     | ChangeTempQuant String
     | ChangeTempUnit String
     | AddToList Ingredient
+    | SetOption String
+    | NewRationalize String
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
+        NewRationalize strng ->
+            case String.toFloat strng of 
+                Nothing -> model
+                Just x -> 
+                    rationalizeIngs model strng
+
+        SetOption strng ->
+            {model | optionFood = strng}
+
         AddToList ing ->
             verifyAdd model ing
 
@@ -149,6 +168,12 @@ update msg model =
 
         Reset ->
             init
+
+rationalizeIngs : Model -> String -> Model 
+rationalizeIngs model strng = model
+    -- if String.isEmpty model.optionIng.food
+    -- then { model | optionNumb = strng }
+    -- else {model | optionNumb = strng}
 
 verifyAdd : Model -> Ingredient -> Model
 verifyAdd model ing =
@@ -346,8 +371,20 @@ view model =
             ([ h1 [] [ text "Time to rationalize this recipe into oblivion" ]
             , h2 [] [ text "New recipe" ]
             , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
+            , div [] [
+                select [onInput SetOption] ([] ++ ingredientOptions model.ingredients)
+                , input [] []
+            ]
             ] ++ viewIngredients model.newIngredients)
         ]
+
+ingredientOptions : List Ingredient -> List (Html Msg) 
+ingredientOptions ings = 
+    case ings of 
+        [] ->
+            []
+        food::foods ->
+            (option [value food.food] [text food.food]) :: ingredientOptions foods 
 
 
 
@@ -421,7 +458,7 @@ buttonIngredients lst numb =
             []
 
         ing :: ings ->
-            div [] [ text ing.food, input [ value ing.quantity, onInput (Rationalize numb) ] [], text ing.unit ] :: buttonIngredients ings (numb + 1)
+            div [] [ text ing.food, input [ onInput (Rationalize numb), value ing.quantity ] [], text ing.unit ] :: buttonIngredients ings (numb + 1)
 
 
 listIngredients : List Ingredient -> List (Html Msg)

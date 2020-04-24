@@ -4436,7 +4436,19 @@ var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$Basics$False = {$: 'False'};
-var $author$project$Main$init = {complete: false, ingredients: _List_Nil, newIngredients: _List_Nil, rationalize: false, scale: false, submitError: false, tempFood: '', tempQuant: '', tempUnit: ''};
+var $author$project$Main$init = {
+	complete: false,
+	ingredients: _List_Nil,
+	newIngredients: _List_Nil,
+	optionFood: '',
+	optionIng: {food: '', quantity: '', unit: ''},
+	rationalize: false,
+	scale: false,
+	submitError: false,
+	tempFood: '',
+	tempQuant: '',
+	tempUnit: ''
+};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -5299,6 +5311,10 @@ var $author$project$Main$newRecipe = function (lst) {
 	}
 };
 var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$rationalizeIngs = F2(
+	function (model, strng) {
+		return model;
+	});
 var $elm$core$List$takeReverse = F3(
 	function (n, list, kept) {
 		takeReverse:
@@ -5570,6 +5586,20 @@ var $author$project$Main$verifyAdd = F2(
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
+			case 'NewRationalize':
+				var strng = msg.a;
+				var _v1 = $elm$core$String$toFloat(strng);
+				if (_v1.$ === 'Nothing') {
+					return model;
+				} else {
+					var x = _v1.a;
+					return A2($author$project$Main$rationalizeIngs, model, strng);
+				}
+			case 'SetOption':
+				var strng = msg.a;
+				return _Utils_update(
+					model,
+					{optionFood: strng});
 			case 'AddToList':
 				var ing = msg.a;
 				return A2($author$project$Main$verifyAdd, model, ing);
@@ -5700,6 +5730,9 @@ var $author$project$Main$ChangeTempUnit = function (a) {
 var $author$project$Main$Scale = function (a) {
 	return {$: 'Scale', a: a};
 };
+var $author$project$Main$SetOption = function (a) {
+	return {$: 'SetOption', a: a};
+};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -5713,6 +5746,31 @@ var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$option = _VirtualDom_node('option');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$ingredientOptions = function (ings) {
+	if (!ings.b) {
+		return _List_Nil;
+	} else {
+		var food = ings.a;
+		var foods = ings.b;
+		return A2(
+			$elm$core$List$cons,
+			A2(
+				$elm$html$Html$option,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$value(food.food)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(food.food)
+					])),
+			$author$project$Main$ingredientOptions(foods));
+	}
+};
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
@@ -5765,9 +5823,7 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $elm$html$Html$select = _VirtualDom_node('select');
 var $author$project$Main$viewIngredients = function (lst) {
 	if (!lst.b) {
 		return _List_Nil;
@@ -5939,6 +5995,22 @@ var $author$project$Main$view = function (model) {
 										[
 											$elm$html$Html$text('Double')
 										]))
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$select,
+									_List_fromArray(
+										[
+											$elm$html$Html$Events$onInput($author$project$Main$SetOption)
+										]),
+									_Utils_ap(
+										_List_Nil,
+										$author$project$Main$ingredientOptions(model.ingredients))),
+									A2($elm$html$Html$input, _List_Nil, _List_Nil)
 								]))
 						]),
 					$author$project$Main$viewIngredients(model.newIngredients)))
