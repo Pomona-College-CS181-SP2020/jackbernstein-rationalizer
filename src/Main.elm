@@ -38,6 +38,8 @@ type alias Recipe =
     , optionIng : Ingredient
     , optionFood : String
     , optionNumb : String
+    , emptyName : Bool
+    , invalidQuant: Bool
     }
 
 
@@ -63,6 +65,8 @@ init =
         }
     , optionFood = ""
     , optionNumb = ""
+    , emptyName = False
+    , invalidQuant = False
     }
 
 
@@ -99,7 +103,7 @@ update msg model =
         NewRationalize strng ->
             case String.toFloat strng of
                 Nothing ->
-                    model
+                    { model | optionNumb = strng}
 
                 Just x ->
                     let
@@ -215,15 +219,15 @@ rationalizeIngs model strng =
 verifyAdd : Model -> Ingredient -> Model
 verifyAdd model ing =
     if String.isEmpty ing.food then
-        model
+        { model | emptyName = True}
 
     else
         case String.toFloat ing.quantity of
             Nothing ->
-                model
+                { model | emptyName = False, invalidQuant = True } 
 
             Just x ->
-                { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", newIngredients = model.newIngredients ++ [ ing ] }
+                { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", newIngredients = model.newIngredients ++ [ ing ], emptyName = False, invalidQuant = False }
 
 
 getIngQuant : List Ingredient -> Int -> Float
@@ -410,31 +414,91 @@ updateUnits lst num newUnit =
 
 view : Model -> Html Msg
 view model =
-    div [ class "row" ]
-        [ div [ class "column" ]
-            ([ h1 [] [ text "OG recipe" ]
-             , div [] [ text "Add ingredients!" ]
-             , div []
-                [ input [ placeholder "Quantity", value model.tempQuant, onInput ChangeTempQuant ] []
-                , input [ placeholder "Units (optional)", value model.tempUnit, onInput ChangeTempUnit ] []
-                , input [ placeholder "Ingredient", value model.tempFood, onInput ChangeTempFood ] []
-                ]
-             , button [ onClick (AddToList { food = model.tempFood, quantity = model.tempQuant, unit = model.tempUnit }) ] [ text "Add Ingredient" ]
-             ]
-                ++ viewIngredients model.ingredients
-            )
-        , div [ class "column" ]
-            ([ h1 [] [ text "Time to rationalize " ]
-             , h2 [] [ text "New recipe" ]
-             , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
-             , div []
-                [ select [ onInput SetOption ] ([ option [] [ text "Select an Ingredient" ] ] ++ ingredientOptions model.ingredients)
-                , input [ value model.optionNumb, onInput NewRationalize ] []
-                ]
-             ]
-                ++ viewIngredients model.newIngredients
-            )
-        ]
+    case model.emptyName of
+        True -> 
+                div [ class "row" ]
+                        [ div [ class "column" ]
+                            ([ h1 [] [ text "OG recipe" ]
+                            , div [] [ text "Add ingredients!" ]
+                            , div []
+                                [ input [ placeholder "Quantity", value model.tempQuant, onInput ChangeTempQuant ] []
+                                , input [ placeholder "Units (optional)", value model.tempUnit, onInput ChangeTempUnit ] []
+                                , input [ placeholder "Ingredient", value model.tempFood, onInput ChangeTempFood ] []
+                                ]
+                            , div [] [text "Must include name of ingredient"]
+                            , button [ onClick (AddToList { food = model.tempFood, quantity = model.tempQuant, unit = model.tempUnit }) ] [ text "Add Ingredient" ]
+                            ]
+                                ++ viewIngredients model.ingredients
+                            )
+                        , div [ class "column" ]
+                            ([ h1 [] [ text "Time to rationalize " ]
+                            , h2 [] [ text "New recipe" ]
+                            , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
+                            , div []
+                                [ select [ onInput SetOption ] ([ option [] [ text "Select an Ingredient" ] ] ++ ingredientOptions model.ingredients)
+                                , input [ value model.optionNumb, onInput NewRationalize ] []
+                                ]
+                            ]
+                                ++ viewIngredients model.newIngredients
+                            )
+                        ]
+ 
+        False -> 
+            case model.invalidQuant of 
+                True -> 
+                    div [ class "row" ]
+                        [ div [ class "column" ]
+                            ([ h1 [] [ text "OG recipe" ]
+                            , div [] [ text "Add ingredients!" ]
+                            , div []
+                                [ input [ placeholder "Quantity", value model.tempQuant, onInput ChangeTempQuant ] []
+                                , input [ placeholder "Units (optional)", value model.tempUnit, onInput ChangeTempUnit ] []
+                                , input [ placeholder "Ingredient", value model.tempFood, onInput ChangeTempFood ] []
+                                ]
+                            , div [] [text "Must include valid quantity"]
+                            , button [ onClick (AddToList { food = model.tempFood, quantity = model.tempQuant, unit = model.tempUnit }) ] [ text "Add Ingredient" ]
+                            ]
+                                ++ viewIngredients model.ingredients
+                            )
+                        , div [ class "column" ]
+                            ([ h1 [] [ text "Time to rationalize " ]
+                            , h2 [] [ text "New recipe" ]
+                            , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
+                            , div []
+                                [ select [ onInput SetOption ] ([ option [] [ text "Select an Ingredient" ] ] ++ ingredientOptions model.ingredients)
+                                , input [ value model.optionNumb, onInput NewRationalize ] []
+                                ]
+                            ]
+                                ++ viewIngredients model.newIngredients
+                            )
+                        ]
+
+                False ->
+                    div [ class "row" ]
+                        [ div [ class "column" ]
+                            ([ h1 [] [ text "OG recipe" ]
+                            , div [] [ text "Add ingredients!" ]
+                            , div []
+                                [ input [ placeholder "Quantity", value model.tempQuant, onInput ChangeTempQuant ] []
+                                , input [ placeholder "Units (optional)", value model.tempUnit, onInput ChangeTempUnit ] []
+                                , input [ placeholder "Ingredient", value model.tempFood, onInput ChangeTempFood ] []
+                                ]
+                            , button [ onClick (AddToList { food = model.tempFood, quantity = model.tempQuant, unit = model.tempUnit }) ] [ text "Add Ingredient" ]
+                            ]
+                                ++ viewIngredients model.ingredients
+                            )
+                        , div [ class "column" ]
+                            ([ h1 [] [ text "Time to rationalize " ]
+                            , h2 [] [ text "New recipe" ]
+                            , div [] [ button [ onClick (Scale 0.5) ] [ text "Halve" ], button [ onClick (Scale 1) ] [ text "Original" ], button [ onClick (Scale 2) ] [ text "Double" ] ]
+                            , div []
+                                [ select [ onInput SetOption ] ([ option [] [ text "Select an Ingredient" ] ] ++ ingredientOptions model.ingredients)
+                                , input [ value model.optionNumb, onInput NewRationalize ] []
+                                ]
+                            ]
+                                ++ viewIngredients model.newIngredients
+                            )
+                        ]
 
 
 ingredientOptions : List Ingredient -> List (Html Msg)
