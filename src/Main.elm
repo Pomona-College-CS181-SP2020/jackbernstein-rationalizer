@@ -224,11 +224,15 @@ view model =
         , div []
             [ div [ class "recipeContainer" ]
                 ([ text "recipe"
-                ] ++ viewIngredients model.ingredients)
+                 ]
+                    ++ viewIngredients model.ingredients
+                )
             , div [ class "filler " ] [ text "test" ]
             , div [ class "recipeContainer" ]
                 ([ text "scaled"
-                ] ++ viewIngredients model.newIngredients)
+                 ]
+                    ++ viewIngredients model.newIngredients
+                )
             ]
         ]
 
