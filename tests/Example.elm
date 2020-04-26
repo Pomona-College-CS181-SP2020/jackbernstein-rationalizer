@@ -17,7 +17,7 @@ suite =
             [ describe "Main.model.initial"
                 [ test "Inital complete boolean is false" <|
                     \_ ->
-                        Expect.equal Main.init.complete False
+                        Expect.equal Main.init.emptyName False
                 ]
             ]
         ]
