@@ -5657,6 +5657,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$h5 = _VirtualDom_node('h5');
 var $elm$html$Html$h6 = _VirtualDom_node('h6');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
@@ -5721,7 +5722,8 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$viewIngredients = function (lst) {
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $author$project$Main$viewIngredientsLeft = function (lst) {
 	if (!lst.b) {
 		return _List_Nil;
 	} else {
@@ -5735,10 +5737,16 @@ var $author$project$Main$viewIngredients = function (lst) {
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(food.quantity + (' ' + food.food))
+							A2(
+							$elm$html$Html$h3,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(food.quantity + (' ' + food.food))
+								]))
 						]))
 				]),
-			$author$project$Main$viewIngredients(foods)) : _Utils_ap(
+			$author$project$Main$viewIngredientsLeft(foods)) : _Utils_ap(
 			_List_fromArray(
 				[
 					A2(
@@ -5746,10 +5754,60 @@ var $author$project$Main$viewIngredients = function (lst) {
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(food.quantity + (' ' + (food.unit + (' of ' + food.food))))
+							A2(
+							$elm$html$Html$h3,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(food.quantity + (' ' + (food.unit + (' of ' + food.food))))
+								]))
 						]))
 				]),
-			$author$project$Main$viewIngredients(foods));
+			$author$project$Main$viewIngredientsLeft(foods));
+	}
+};
+var $elm$html$Html$h4 = _VirtualDom_node('h4');
+var $author$project$Main$viewIngredientsRight = function (lst) {
+	if (!lst.b) {
+		return _List_Nil;
+	} else {
+		var food = lst.a;
+		var foods = lst.b;
+		return $elm$core$String$isEmpty(food.unit) ? _Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h4,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(food.quantity + (' ' + food.food))
+								]))
+						]))
+				]),
+			$author$project$Main$viewIngredientsRight(foods)) : _Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h4,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(food.quantity + (' ' + (food.unit + (' of ' + food.food))))
+								]))
+						]))
+				]),
+			$author$project$Main$viewIngredientsRight(foods));
 	}
 };
 var $author$project$Main$view = function (model) {
@@ -5766,13 +5824,6 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$h6,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Add ingredient')
-							])),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
@@ -5862,14 +5913,14 @@ var $author$project$Main$view = function (model) {
 							_List_fromArray(
 								[
 									A2(
-									$elm$html$Html$h6,
+									$elm$html$Html$h5,
 									_List_Nil,
 									_List_fromArray(
 										[
 											$elm$html$Html$text('recipe')
 										]))
 								]),
-							$author$project$Main$viewIngredients(model.ingredients))),
+							$author$project$Main$viewIngredientsLeft(model.ingredients))),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
@@ -5887,7 +5938,7 @@ var $author$project$Main$view = function (model) {
 											$elm$html$Html$text('scaled')
 										]))
 								]),
-							$author$project$Main$viewIngredients(model.newIngredients)))
+							$author$project$Main$viewIngredientsRight(model.newIngredients)))
 					]))
 			]));
 };

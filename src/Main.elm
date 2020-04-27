@@ -148,8 +148,12 @@ newMapIngredients lst flt =
                     food :: newMapIngredients foods flt
 
                 Just x ->
-                    { food | quantity = Round.round 1 (x * flt) } :: newMapIngredients foods flt
+                    case toInt (x * flt) of 
+                        Nothing -> 
+                            { food | quantity = Round.round 1 (x * flt) } :: newMapIngredients foods flt
 
+                        Just y -> 
+                            { food | quantity = String.fromFloat (x * flt) } :: newMapIngredients foods flt
 
 
 -- VIEW
@@ -159,8 +163,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [ class "ingredientInput" ]
-            [ h6 [] [text "Add ingredient"]
-            , div [ onKeyDown KeyDown ]
+            [ div [ onKeyDown KeyDown ]
                 [ input [ class "form_input", placeholder "Quantity", value model.tempQuant, onInput ChangeTempQuant ] []
                 , input [ class "form_input", placeholder "Units (optional)", value model.tempUnit, onInput ChangeTempUnit ] []
                 , input [ class "form_input", placeholder "Ingredient", value model.tempFood, onInput ChangeTempFood ] []
@@ -172,14 +175,14 @@ view model =
             ]
         , div [class "grid-divider"]
             [ div [ class "recipeContainer" ]
-                ([ h6 [] [text "recipe"]
+                ([ h5 [] [text "recipe"]
                  ]
-                    ++ viewIngredients model.ingredients
+                    ++ viewIngredientsLeft model.ingredients 
                 )
             , div [ class "recipeContainerRight" ]
                 ([ h6 [] [text "scaled"]
                  ]
-                    ++ viewIngredients model.newIngredients
+                    ++ viewIngredientsRight model.newIngredients 
                 )
             ]
         ]
@@ -190,8 +193,8 @@ onKeyDown tagger =
     on "keydown" (Json.map tagger keyCode)
 
 
-viewIngredients : List Ingredient -> List (Html Msg)
-viewIngredients lst =
+viewIngredientsLeft : List Ingredient -> List (Html Msg)
+viewIngredientsLeft lst =
     case lst of
         [] ->
             []
@@ -199,14 +202,35 @@ viewIngredients lst =
         food :: foods ->
             if String.isEmpty food.unit then
                 [ div []
-                    [ text (food.quantity ++ " " ++ food.food)
+                    [ h3 [] [text (food.quantity ++ " " ++ food.food)]
                     ]
                 ]
-                    ++ viewIngredients foods
+                    ++ viewIngredientsLeft foods
 
             else
                 [ div []
-                    [ text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food)
+                    [ h3 [] [text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food)]
                     ]
                 ]
-                    ++ viewIngredients foods
+                    ++ viewIngredientsLeft foods
+
+viewIngredientsRight : List Ingredient -> List (Html Msg)
+viewIngredientsRight lst  =
+    case lst of
+        [] ->
+            []
+
+        food :: foods ->
+            if String.isEmpty food.unit then
+                [ div []
+                    [ h4 [] [text (food.quantity ++ " " ++ food.food)]
+                    ]
+                ]
+                    ++ viewIngredientsRight foods
+
+            else
+                [ div []
+                    [ h4 [] [text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food)]
+                    ]
+                ]
+                    ++ viewIngredientsRight foods
