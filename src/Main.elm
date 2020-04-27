@@ -148,12 +148,8 @@ newMapIngredients lst flt =
                     food :: newMapIngredients foods flt
 
                 Just x ->
-                    case toInt (x * flt) of 
-                        Nothing -> 
-                            { food | quantity = Round.round 1 (x * flt) } :: newMapIngredients foods flt
+                    { food | quantity = Round.round 1 (x * flt) } :: newMapIngredients foods flt
 
-                        Just y -> 
-                            { food | quantity = String.fromFloat (x * flt) } :: newMapIngredients foods flt
 
 
 -- VIEW
@@ -173,16 +169,16 @@ view model =
             [ div [] [ text (String.fromFloat model.sliderVal) ]
             , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
             ]
-        , div [class "grid-divider"]
+        , div [ class "grid-divider" ]
             [ div [ class "recipeContainer" ]
-                ([ h5 [] [text "recipe"]
+                ([ h5 [] [ text "recipe" ]
                  ]
-                    ++ viewIngredientsLeft model.ingredients 
+                    ++ viewIngredientsLeft model.ingredients
                 )
             , div [ class "recipeContainerRight" ]
-                ([ h6 [] [text "scaled"]
+                ([ h6 [] [ text "scaled" ]
                  ]
-                    ++ viewIngredientsRight model.newIngredients 
+                    ++ viewIngredientsRight model.newIngredients
                 )
             ]
         ]
@@ -202,20 +198,21 @@ viewIngredientsLeft lst =
         food :: foods ->
             if String.isEmpty food.unit then
                 [ div []
-                    [ h3 [] [text (food.quantity ++ " " ++ food.food)]
+                    [ h3 [] [ text (food.quantity ++ " " ++ food.food) ]
                     ]
                 ]
                     ++ viewIngredientsLeft foods
 
             else
                 [ div []
-                    [ h3 [] [text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food)]
+                    [ h3 [] [ text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food) ]
                     ]
                 ]
                     ++ viewIngredientsLeft foods
 
+
 viewIngredientsRight : List Ingredient -> List (Html Msg)
-viewIngredientsRight lst  =
+viewIngredientsRight lst =
     case lst of
         [] ->
             []
@@ -223,14 +220,14 @@ viewIngredientsRight lst  =
         food :: foods ->
             if String.isEmpty food.unit then
                 [ div []
-                    [ h4 [] [text (food.quantity ++ " " ++ food.food)]
+                    [ h4 [] [ text (food.quantity ++ " " ++ food.food) ]
                     ]
                 ]
                     ++ viewIngredientsRight foods
 
             else
                 [ div []
-                    [ h4 [] [text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food)]
+                    [ h4 [] [ text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food) ]
                     ]
                 ]
                     ++ viewIngredientsRight foods
