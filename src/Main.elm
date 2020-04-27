@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
+import Round exposing (..)
 
 
 
@@ -75,7 +76,6 @@ type Msg
     | ChangeTempUnit String
     | AddToList Ingredient
     | SetOption String
-    | NewRationalize String
     | Scale Float
     | KeyDown Int
     | UpdateSlider String
@@ -87,7 +87,7 @@ update msg model =
         UpdateSlider strng ->
             case String.toFloat strng of
                 Just x ->
-                    { model | sliderVal = x }
+                    { model | sliderVal = x, newIngredients = newMapIngredients model.ingredients x }
 
                 Nothing ->
                     model
@@ -98,23 +98,6 @@ update msg model =
 
             else
                 model
-
-        NewRationalize strng ->
-            case String.toFloat strng of
-                Nothing ->
-                    { model | optionNumb = strng }
-
-                Just x ->
-                    let
-                        scalr =
-                            findQuant model.newIngredients model.optionFood
-                    in
-                    case scalr of
-                        Nothing ->
-                            { model | optionNumb = strng }
-
-                        Just y ->
-                            { model | newIngredients = newMapIngredients model.newIngredients (x / y), optionNumb = strng }
 
         SetOption strng ->
             if strng == "Select an Ingredient" then
@@ -139,20 +122,6 @@ update msg model =
             { model | newIngredients = newMapIngredients model.newIngredients flt }
 
 
-findQuant : List Ingredient -> String -> Maybe Float
-findQuant lst strng =
-    case lst of
-        [] ->
-            Nothing
-
-        ing :: ings ->
-            if ing.food == strng then
-                String.toFloat ing.quantity
-
-            else
-                findQuant ings strng
-
-
 verifyAdd : Model -> Ingredient -> Model
 verifyAdd model ing =
     if String.isEmpty ing.food then
@@ -164,27 +133,7 @@ verifyAdd model ing =
                 { model | emptyName = False, invalidQuant = True }
 
             Just x ->
-                { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", newIngredients = model.newIngredients ++ [ ing ], emptyName = False, invalidQuant = False }
-
-
-getIngQuant : List Ingredient -> Int -> Float
-getIngQuant lst num =
-    case lst of
-        [] ->
-            0.0
-
-        ing :: ings ->
-            case num of
-                0 ->
-                    case String.toFloat ing.quantity of
-                        Just x ->
-                            x
-
-                        Nothing ->
-                            0.0
-
-                x ->
-                    getIngQuant ings (num - 1)
+                { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", emptyName = False, invalidQuant = False, newIngredients = newMapIngredients (model.ingredients ++ [ ing ]) model.sliderVal }
 
 
 newMapIngredients : List Ingredient -> Float -> List Ingredient
@@ -199,7 +148,7 @@ newMapIngredients lst flt =
                     food :: newMapIngredients foods flt
 
                 Just x ->
-                    { food | quantity = String.fromFloat (x * flt) } :: newMapIngredients foods flt
+                    { food | quantity = Round.round 1 (x * flt) } :: newMapIngredients foods flt
 
 
 
@@ -240,16 +189,6 @@ view model =
 onKeyDown : (Int -> msg) -> Attribute msg
 onKeyDown tagger =
     on "keydown" (Json.map tagger keyCode)
-
-
-ingredientOptions : List Ingredient -> List (Html Msg)
-ingredientOptions ings =
-    case ings of
-        [] ->
-            []
-
-        food :: foods ->
-            option [ value food.food ] [ text food.food ] :: ingredientOptions foods
 
 
 viewIngredients : List Ingredient -> List (Html Msg)
