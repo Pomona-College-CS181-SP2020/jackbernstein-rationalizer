@@ -4355,43 +4355,6 @@ function _Browser_load(url)
 		}
 	}));
 }
-
-
-
-var _Bitwise_and = F2(function(a, b)
-{
-	return a & b;
-});
-
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
 var $elm$core$List$cons = _List_cons;
 var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var $elm$core$Array$foldr = F3(
@@ -4473,19 +4436,7 @@ var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$Basics$False = {$: 'False'};
-var $author$project$Main$init = {
-	emptyName: false,
-	ingredients: _List_Nil,
-	invalidQuant: false,
-	newIngredients: _List_Nil,
-	optionFood: '',
-	optionIng: {food: '', quantity: '', unit: ''},
-	optionNumb: '',
-	sliderVal: 1.0,
-	tempFood: '',
-	tempQuant: '',
-	tempUnit: ''
-};
+var $author$project$Main$init = {changedNewIngs: _List_Nil, emptyName: false, invalidQuant: false, listNewIngredients: _List_Nil, optionFood: '', optionNumb: '', sliderVal: 1.0, tempFood: '', tempQuant: '', tempUnit: '', total: ''};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -5215,386 +5166,64 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
-var $author$project$Main$AddToList = function (a) {
-	return {$: 'AddToList', a: a};
-};
+var $author$project$Main$AddNewIngredient = {$: 'AddNewIngredient'};
 var $author$project$Main$del = F2(
-	function (lst, food) {
-		if (!lst.b) {
-			return _List_Nil;
-		} else {
-			var ing = lst.a;
-			var ings = lst.b;
-			return _Utils_eq(food, ing) ? ings : A2(
-				$elm$core$List$cons,
-				ing,
-				A2($author$project$Main$del, ings, food));
-		}
-	});
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Basics$not = _Basics_not;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $elm$core$Basics$abs = function (n) {
-	return (n < 0) ? (-n) : n;
-};
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $myrho$elm_round$Round$addSign = F2(
-	function (signed, str) {
-		var isNotZero = A2(
-			$elm$core$List$any,
-			function (c) {
-				return (!_Utils_eq(
-					c,
-					_Utils_chr('0'))) && (!_Utils_eq(
-					c,
-					_Utils_chr('.')));
-			},
-			$elm$core$String$toList(str));
-		return _Utils_ap(
-			(signed && isNotZero) ? '-' : '',
-			str);
-	});
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$core$String$cons = _String_cons;
-var $elm$core$Char$fromCode = _Char_fromCode;
-var $myrho$elm_round$Round$increaseNum = function (_v0) {
-	var head = _v0.a;
-	var tail = _v0.b;
-	if (_Utils_eq(
-		head,
-		_Utils_chr('9'))) {
-		var _v1 = $elm$core$String$uncons(tail);
-		if (_v1.$ === 'Nothing') {
-			return '01';
-		} else {
-			var headtail = _v1.a;
-			return A2(
-				$elm$core$String$cons,
-				_Utils_chr('0'),
-				$myrho$elm_round$Round$increaseNum(headtail));
-		}
-	} else {
-		var c = $elm$core$Char$toCode(head);
-		return ((c >= 48) && (c < 57)) ? A2(
-			$elm$core$String$cons,
-			$elm$core$Char$fromCode(c + 1),
-			tail) : '0';
-	}
-};
-var $elm$core$Basics$isInfinite = _Basics_isInfinite;
-var $elm$core$Basics$isNaN = _Basics_isNaN;
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
-var $elm$core$String$repeatHelp = F3(
-	function (n, chunk, result) {
-		return (n <= 0) ? result : A3(
-			$elm$core$String$repeatHelp,
-			n >> 1,
-			_Utils_ap(chunk, chunk),
-			(!(n & 1)) ? result : _Utils_ap(result, chunk));
-	});
-var $elm$core$String$repeat = F2(
-	function (n, chunk) {
-		return A3($elm$core$String$repeatHelp, n, chunk, '');
-	});
-var $elm$core$String$padRight = F3(
-	function (n, _char, string) {
-		return _Utils_ap(
-			string,
-			A2(
-				$elm$core$String$repeat,
-				n - $elm$core$String$length(string),
-				$elm$core$String$fromChar(_char)));
-	});
-var $elm$core$String$reverse = _String_reverse;
-var $myrho$elm_round$Round$splitComma = function (str) {
-	var _v0 = A2($elm$core$String$split, '.', str);
-	if (_v0.b) {
-		if (_v0.b.b) {
-			var before = _v0.a;
-			var _v1 = _v0.b;
-			var after = _v1.a;
-			return _Utils_Tuple2(before, after);
-		} else {
-			var before = _v0.a;
-			return _Utils_Tuple2(before, '0');
-		}
-	} else {
-		return _Utils_Tuple2('0', '0');
-	}
-};
-var $elm$core$Tuple$mapFirst = F2(
-	function (func, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return _Utils_Tuple2(
-			func(x),
-			y);
-	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var $myrho$elm_round$Round$toDecimal = function (fl) {
-	var _v0 = A2(
-		$elm$core$String$split,
-		'e',
-		$elm$core$String$fromFloat(
-			$elm$core$Basics$abs(fl)));
-	if (_v0.b) {
-		if (_v0.b.b) {
-			var num = _v0.a;
-			var _v1 = _v0.b;
-			var exp = _v1.a;
-			var e = A2(
-				$elm$core$Maybe$withDefault,
-				0,
-				$elm$core$String$toInt(
-					A2($elm$core$String$startsWith, '+', exp) ? A2($elm$core$String$dropLeft, 1, exp) : exp));
-			var _v2 = $myrho$elm_round$Round$splitComma(num);
-			var before = _v2.a;
-			var after = _v2.b;
-			var total = _Utils_ap(before, after);
-			var zeroed = (e < 0) ? A2(
-				$elm$core$Maybe$withDefault,
-				'0',
-				A2(
-					$elm$core$Maybe$map,
-					function (_v3) {
-						var a = _v3.a;
-						var b = _v3.b;
-						return a + ('.' + b);
-					},
-					A2(
-						$elm$core$Maybe$map,
-						$elm$core$Tuple$mapFirst($elm$core$String$fromChar),
-						$elm$core$String$uncons(
-							_Utils_ap(
-								A2(
-									$elm$core$String$repeat,
-									$elm$core$Basics$abs(e),
-									'0'),
-								total))))) : A3(
-				$elm$core$String$padRight,
-				e + 1,
-				_Utils_chr('0'),
-				total);
-			return _Utils_ap(
-				(fl < 0) ? '-' : '',
-				zeroed);
-		} else {
-			var num = _v0.a;
-			return _Utils_ap(
-				(fl < 0) ? '-' : '',
-				num);
-		}
-	} else {
-		return '';
-	}
-};
-var $myrho$elm_round$Round$roundFun = F3(
-	function (functor, s, fl) {
-		if ($elm$core$Basics$isInfinite(fl) || $elm$core$Basics$isNaN(fl)) {
-			return $elm$core$String$fromFloat(fl);
-		} else {
-			var signed = fl < 0;
-			var _v0 = $myrho$elm_round$Round$splitComma(
-				$myrho$elm_round$Round$toDecimal(
-					$elm$core$Basics$abs(fl)));
-			var before = _v0.a;
-			var after = _v0.b;
-			var r = $elm$core$String$length(before) + s;
-			var normalized = _Utils_ap(
-				A2($elm$core$String$repeat, (-r) + 1, '0'),
-				A3(
-					$elm$core$String$padRight,
-					r,
-					_Utils_chr('0'),
-					_Utils_ap(before, after)));
-			var totalLen = $elm$core$String$length(normalized);
-			var roundDigitIndex = A2($elm$core$Basics$max, 1, r);
-			var increase = A2(
-				functor,
-				signed,
-				A3($elm$core$String$slice, roundDigitIndex, totalLen, normalized));
-			var remains = A3($elm$core$String$slice, 0, roundDigitIndex, normalized);
-			var num = increase ? $elm$core$String$reverse(
-				A2(
-					$elm$core$Maybe$withDefault,
-					'1',
-					A2(
-						$elm$core$Maybe$map,
-						$myrho$elm_round$Round$increaseNum,
-						$elm$core$String$uncons(
-							$elm$core$String$reverse(remains))))) : remains;
-			var numLen = $elm$core$String$length(num);
-			var numZeroed = (num === '0') ? num : ((s <= 0) ? _Utils_ap(
-				num,
-				A2(
-					$elm$core$String$repeat,
-					$elm$core$Basics$abs(s),
-					'0')) : ((_Utils_cmp(
-				s,
-				$elm$core$String$length(after)) < 0) ? (A3($elm$core$String$slice, 0, numLen - s, num) + ('.' + A3($elm$core$String$slice, numLen - s, numLen, num))) : _Utils_ap(
-				before + '.',
-				A3(
-					$elm$core$String$padRight,
-					s,
-					_Utils_chr('0'),
-					after))));
-			return A2($myrho$elm_round$Round$addSign, signed, numZeroed);
-		}
-	});
-var $myrho$elm_round$Round$round = $myrho$elm_round$Round$roundFun(
-	F2(
-		function (signed, str) {
-			var _v0 = $elm$core$String$uncons(str);
-			if (_v0.$ === 'Nothing') {
-				return false;
-			} else {
-				if ('5' === _v0.a.a.valueOf()) {
-					if (_v0.a.b === '') {
-						var _v1 = _v0.a;
-						return !signed;
-					} else {
-						var _v2 = _v0.a;
-						return true;
-					}
-				} else {
-					var _v3 = _v0.a;
-					var _int = _v3.a;
-					return function (i) {
-						return ((i > 53) && signed) || ((i >= 53) && (!signed));
-					}(
-						$elm$core$Char$toCode(_int));
-				}
-			}
-		}));
-var $elm$core$String$toFloat = _String_toFloat;
-var $author$project$Main$newMapIngredients = F2(
-	function (lst, flt) {
+	function (lst, ing) {
 		if (!lst.b) {
 			return _List_Nil;
 		} else {
 			var food = lst.a;
 			var foods = lst.b;
-			var _v1 = $elm$core$String$toFloat(food.quantity);
-			if (_v1.$ === 'Nothing') {
-				return A2(
-					$elm$core$List$cons,
-					food,
-					A2($author$project$Main$newMapIngredients, foods, flt));
-			} else {
-				var x = _v1.a;
-				return A2(
-					$elm$core$List$cons,
-					_Utils_update(
-						food,
-						{
-							quantity: A2($myrho$elm_round$Round$round, 1, x * flt)
-						}),
-					A2($author$project$Main$newMapIngredients, foods, flt));
-			}
+			return _Utils_eq(food.food, ing.food) ? foods : A2(
+				$elm$core$List$cons,
+				food,
+				A2($author$project$Main$del, foods, ing));
 		}
 	});
-var $author$project$Main$verifyAdd = F2(
-	function (model, ing) {
-		if ($elm$core$String$isEmpty(ing.food)) {
-			return _Utils_update(
-				model,
-				{emptyName: true});
+var $author$project$Main$scale = F2(
+	function (lst, flt) {
+		if (!lst.b) {
+			return _List_Nil;
 		} else {
-			var _v0 = $elm$core$String$toFloat(ing.quantity);
-			if (_v0.$ === 'Nothing') {
-				return _Utils_update(
-					model,
-					{emptyName: false, invalidQuant: true});
-			} else {
-				var x = _v0.a;
-				return _Utils_update(
-					model,
-					{
-						emptyName: false,
-						ingredients: _Utils_ap(
-							model.ingredients,
-							_List_fromArray(
-								[ing])),
-						invalidQuant: false,
-						newIngredients: A2(
-							$author$project$Main$newMapIngredients,
-							_Utils_ap(
-								model.ingredients,
-								_List_fromArray(
-									[ing])),
-							model.sliderVal),
-						tempFood: '',
-						tempQuant: '',
-						tempUnit: ''
-					});
-			}
+			var ing = lst.a;
+			var ings = lst.b;
+			return A2(
+				$elm$core$List$cons,
+				_Utils_update(
+					ing,
+					{quantity: ing.quantity * flt}),
+				A2($author$project$Main$scale, ings, flt));
 		}
 	});
+var $elm$core$String$toFloat = _String_toFloat;
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		update:
 		while (true) {
 			switch (msg.$) {
-				case 'Delete':
-					var food = msg.a;
+				case 'AddNewIngredient':
 					return _Utils_update(
 						model,
 						{
-							ingredients: A2($author$project$Main$del, model.ingredients, food),
-							newIngredients: A2(
-								$author$project$Main$newMapIngredients,
-								A2($author$project$Main$del, model.ingredients, food),
-								model.sliderVal)
+							changedNewIngs: _Utils_ap(
+								model.changedNewIngs,
+								_List_fromArray(
+									[
+										{food: model.total, quantity: 1.0 * model.sliderVal}
+									])),
+							listNewIngredients: _Utils_ap(
+								model.listNewIngredients,
+								_List_fromArray(
+									[
+										{food: model.total, quantity: 1.0}
+									])),
+							total: ''
 						});
+				case 'ChangeTotal':
+					var tot = msg.a;
+					return _Utils_update(
+						model,
+						{total: tot});
 				case 'UpdateSlider':
 					var strng = msg.a;
 					var _v1 = $elm$core$String$toFloat(strng);
@@ -5603,7 +5232,7 @@ var $author$project$Main$update = F2(
 						return _Utils_update(
 							model,
 							{
-								newIngredients: A2($author$project$Main$newMapIngredients, model.ingredients, x),
+								changedNewIngs: A2($author$project$Main$scale, model.listNewIngredients, x),
 								sliderVal: x
 							});
 					} else {
@@ -5612,8 +5241,7 @@ var $author$project$Main$update = F2(
 				case 'KeyDown':
 					var key = msg.a;
 					if (key === 13) {
-						var $temp$msg = $author$project$Main$AddToList(
-							{food: model.tempFood, quantity: model.tempQuant, unit: model.tempUnit}),
+						var $temp$msg = $author$project$Main$AddNewIngredient,
 							$temp$model = model;
 						msg = $temp$msg;
 						model = $temp$model;
@@ -5628,9 +5256,6 @@ var $author$project$Main$update = F2(
 						{optionFood: '', optionNumb: ''}) : _Utils_update(
 						model,
 						{optionFood: strng, optionNumb: ''});
-				case 'AddToList':
-					var ing = msg.a;
-					return A2($author$project$Main$verifyAdd, model, ing);
 				case 'ChangeTempFood':
 					var food = msg.a;
 					return _Utils_update(
@@ -5646,24 +5271,22 @@ var $author$project$Main$update = F2(
 					return _Utils_update(
 						model,
 						{tempUnit: unit});
-				default:
+				case 'Scale':
 					var flt = msg.a;
+					return model;
+				default:
+					var food = msg.a;
 					return _Utils_update(
 						model,
 						{
-							newIngredients: A2($author$project$Main$newMapIngredients, model.newIngredients, flt)
+							changedNewIngs: A2($author$project$Main$del, model.changedNewIngs, food),
+							listNewIngredients: A2($author$project$Main$del, model.listNewIngredients, food)
 						});
 			}
 		}
 	});
-var $author$project$Main$ChangeTempFood = function (a) {
-	return {$: 'ChangeTempFood', a: a};
-};
-var $author$project$Main$ChangeTempQuant = function (a) {
-	return {$: 'ChangeTempQuant', a: a};
-};
-var $author$project$Main$ChangeTempUnit = function (a) {
-	return {$: 'ChangeTempUnit', a: a};
+var $author$project$Main$ChangeTotal = function (a) {
+	return {$: 'ChangeTotal', a: a};
 };
 var $author$project$Main$KeyDown = function (a) {
 	return {$: 'KeyDown', a: a};
@@ -5681,18 +5304,108 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$h5 = _VirtualDom_node('h5');
 var $elm$html$Html$h6 = _VirtualDom_node('h6');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
 var $elm$html$Html$Attributes$min = $elm$html$Html$Attributes$stringProperty('min');
+var $author$project$Main$Delete = function (a) {
+	return {$: 'Delete', a: a};
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$newViewIngredientsLeft = function (lst) {
+	if (!lst.b) {
+		return _List_Nil;
+	} else {
+		var food = lst.a;
+		var foods = lst.b;
+		return _Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$Delete(food))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('X')
+								])),
+							A2(
+							$elm$html$Html$h3,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromFloat(food.quantity) + (' ' + food.food))
+								]))
+						]))
+				]),
+			$author$project$Main$newViewIngredientsLeft(foods));
+	}
+};
+var $elm$html$Html$h4 = _VirtualDom_node('h4');
+var $author$project$Main$newViewIngredientsRight = function (lst) {
+	if (!lst.b) {
+		return _List_Nil;
+	} else {
+		var food = lst.a;
+		var foods = lst.b;
+		return _Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$h4,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromFloat(food.quantity) + (' ' + food.food))
+								]))
+						]))
+				]),
+			$author$project$Main$newViewIngredientsRight(foods));
+	}
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -5722,16 +5435,6 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 };
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$html$Html$Events$keyCode = A2($elm$json$Json$Decode$field, 'keyCode', $elm$json$Json$Decode$int);
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
 var $author$project$Main$onKeyDown = function (tagger) {
 	return A2(
 		$elm$html$Html$Events$on,
@@ -5742,130 +5445,8 @@ var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProp
 var $elm$html$Html$Attributes$step = function (n) {
 	return A2($elm$html$Html$Attributes$stringProperty, 'step', n);
 };
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$Delete = function (a) {
-	return {$: 'Delete', a: a};
-};
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $author$project$Main$viewIngredientsLeft = function (lst) {
-	if (!lst.b) {
-		return _List_Nil;
-	} else {
-		var food = lst.a;
-		var foods = lst.b;
-		return $elm$core$String$isEmpty(food.unit) ? _Utils_ap(
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onClick(
-									$author$project$Main$Delete(food))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('X')
-								])),
-							A2(
-							$elm$html$Html$h3,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text(food.quantity + (' ' + food.food))
-								]))
-						]))
-				]),
-			$author$project$Main$viewIngredientsLeft(foods)) : _Utils_ap(
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onClick(
-									$author$project$Main$Delete(food))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('X')
-								])),
-							A2(
-							$elm$html$Html$h3,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text(food.quantity + (' ' + (food.unit + (' of ' + food.food))))
-								]))
-						]))
-				]),
-			$author$project$Main$viewIngredientsLeft(foods));
-	}
-};
-var $elm$html$Html$h4 = _VirtualDom_node('h4');
-var $author$project$Main$viewIngredientsRight = function (lst) {
-	if (!lst.b) {
-		return _List_Nil;
-	} else {
-		var food = lst.a;
-		var foods = lst.b;
-		return $elm$core$String$isEmpty(food.unit) ? _Utils_ap(
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$h4,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text(food.quantity + (' ' + food.food))
-								]))
-						]))
-				]),
-			$author$project$Main$viewIngredientsRight(foods)) : _Utils_ap(
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$h4,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text(food.quantity + (' ' + (food.unit + (' of ' + food.food))))
-								]))
-						]))
-				]),
-			$author$project$Main$viewIngredientsRight(foods));
-	}
-};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -5876,49 +5457,20 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('ingredientInput')
+						$elm$html$Html$Attributes$class('ingredientInput'),
+						$author$project$Main$onKeyDown($author$project$Main$KeyDown)
 					]),
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$div,
+						$elm$html$Html$input,
 						_List_fromArray(
 							[
-								$author$project$Main$onKeyDown($author$project$Main$KeyDown)
+								$elm$html$Html$Attributes$placeholder('Input'),
+								$elm$html$Html$Attributes$value(model.total),
+								$elm$html$Html$Events$onInput($author$project$Main$ChangeTotal)
 							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('form_input'),
-										$elm$html$Html$Attributes$placeholder('Quantity'),
-										$elm$html$Html$Attributes$value(model.tempQuant),
-										$elm$html$Html$Events$onInput($author$project$Main$ChangeTempQuant)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('form_input'),
-										$elm$html$Html$Attributes$placeholder('Units (optional)'),
-										$elm$html$Html$Attributes$value(model.tempUnit),
-										$elm$html$Html$Events$onInput($author$project$Main$ChangeTempUnit)
-									]),
-								_List_Nil),
-								A2(
-								$elm$html$Html$input,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('form_input'),
-										$elm$html$Html$Attributes$placeholder('Ingredient'),
-										$elm$html$Html$Attributes$value(model.tempFood),
-										$elm$html$Html$Events$onInput($author$project$Main$ChangeTempFood)
-									]),
-								_List_Nil)
-							]))
+						_List_Nil)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -5973,7 +5525,7 @@ var $author$project$Main$view = function (model) {
 											$elm$html$Html$text('recipe')
 										]))
 								]),
-							$author$project$Main$viewIngredientsLeft(model.ingredients))),
+							$author$project$Main$newViewIngredientsLeft(model.listNewIngredients))),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
@@ -5991,7 +5543,7 @@ var $author$project$Main$view = function (model) {
 											$elm$html$Html$text('scaled')
 										]))
 								]),
-							$author$project$Main$viewIngredientsRight(model.newIngredients)))
+							$author$project$Main$newViewIngredientsRight(model.changedNewIngs)))
 					]))
 			]));
 };

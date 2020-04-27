@@ -20,25 +20,24 @@ main =
 -- MODEL
 
 
-type alias Ingredient =
+type alias NewIngredient = 
     { food : String
-    , quantity : String
-    , unit : String
+    , quantity : Float 
     }
 
 
 type alias Recipe =
-    { ingredients : List Ingredient
-    , newIngredients : List Ingredient
-    , tempFood : String
+    { tempFood : String
     , tempQuant : String
     , tempUnit : String
-    , optionIng : Ingredient
     , optionFood : String
     , optionNumb : String
     , emptyName : Bool
     , invalidQuant : Bool
     , sliderVal : Float
+    , total : String
+    , listNewIngredients : List NewIngredient
+    , changedNewIngs : List NewIngredient
     }
 
 
@@ -48,21 +47,17 @@ type alias Model =
 
 init : Model
 init =
-    { ingredients = []
-    , newIngredients = []
-    , tempFood = ""
+    { tempFood = ""
     , tempQuant = ""
     , tempUnit = ""
-    , optionIng =
-        { food = ""
-        , quantity = ""
-        , unit = ""
-        }
     , optionFood = ""
     , optionNumb = ""
     , emptyName = False
     , invalidQuant = False
     , sliderVal = 1.0
+    , total = ""
+    , listNewIngredients = []
+    , changedNewIngs = []
     }
 
 
@@ -74,31 +69,35 @@ type Msg
     = ChangeTempFood String
     | ChangeTempQuant String
     | ChangeTempUnit String
-    | AddToList Ingredient
     | SetOption String
     | Scale Float
     | KeyDown Int
     | UpdateSlider String
-    | Delete Ingredient
+    | ChangeTotal String
+    | AddNewIngredient
+    | Delete NewIngredient
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Delete food -> 
-            {model | ingredients = del model.ingredients food, newIngredients = newMapIngredients ( del model.ingredients food) model.sliderVal}
+        AddNewIngredient -> 
+            { model | listNewIngredients = model.listNewIngredients ++ [{food = model.total, quantity = 1.0}], changedNewIngs = model.changedNewIngs ++ [{food = model.total, quantity = 1.0 * model.sliderVal}],  total = ""}
+
+        ChangeTotal tot ->
+            { model | total = tot}
 
         UpdateSlider strng ->
             case String.toFloat strng of
                 Just x ->
-                    { model | sliderVal = x, newIngredients = newMapIngredients model.ingredients x }
+                    { model | sliderVal = x, changedNewIngs = scale model.listNewIngredients x}
 
                 Nothing ->
                     model
 
         KeyDown key ->
             if key == 13 then
-                update (AddToList { food = model.tempFood, quantity = model.tempQuant, unit = model.tempUnit }) model
+                update AddNewIngredient model 
 
             else
                 model
@@ -110,9 +109,6 @@ update msg model =
             else
                 { model | optionFood = strng, optionNumb = "" }
 
-        AddToList ing ->
-            verifyAdd model ing
-
         ChangeTempFood food ->
             { model | tempFood = food }
 
@@ -123,48 +119,30 @@ update msg model =
             { model | tempUnit = unit }
 
         Scale flt ->
-            { model | newIngredients = newMapIngredients model.newIngredients flt }
+            model
 
+        Delete food -> 
+            { model | listNewIngredients = del model.listNewIngredients food, changedNewIngs = del model.changedNewIngs food}
 
-del : List Ingredient -> Ingredient -> List Ingredient 
-del lst food =
+del : List NewIngredient -> NewIngredient -> List NewIngredient
+del lst ing = 
     case lst of 
-        [] -> 
-            []
-        
-        ing :: ings -> 
-            if food == ing
-            then ings
-            else ing :: del ings food 
-
-
-verifyAdd : Model -> Ingredient -> Model
-verifyAdd model ing =
-    if String.isEmpty ing.food then
-        { model | emptyName = True }
-
-    else
-        case String.toFloat ing.quantity of
-            Nothing ->
-                { model | emptyName = False, invalidQuant = True }
-
-            Just x ->
-                { model | ingredients = model.ingredients ++ [ ing ], tempFood = "", tempQuant = "", tempUnit = "", emptyName = False, invalidQuant = False, newIngredients = newMapIngredients (model.ingredients ++ [ ing ]) model.sliderVal }
-
-
-newMapIngredients : List Ingredient -> Float -> List Ingredient
-newMapIngredients lst flt =
-    case lst of
         [] ->
             []
 
-        food :: foods ->
-            case String.toFloat food.quantity of
-                Nothing ->
-                    food :: newMapIngredients foods flt
+        food :: foods -> 
+            if food.food == ing.food
+            then foods 
+            else food :: del foods ing
 
-                Just x ->
-                    { food | quantity = Round.round 1 (x * flt) } :: newMapIngredients foods flt
+scale : List NewIngredient -> Float -> List NewIngredient 
+scale lst flt = 
+    case lst of 
+        [] -> 
+            []
+
+        ing :: ings -> 
+            {ing | quantity = ing.quantity * flt} :: scale ings flt
 
 
 
@@ -174,13 +152,9 @@ newMapIngredients lst flt =
 view : Model -> Html Msg
 view model =
     div []
-        [ div [ class "ingredientInput" ]
-            [ div [ onKeyDown KeyDown ]
-                [ input [ class "form_input", placeholder "Quantity", value model.tempQuant, onInput ChangeTempQuant ] []
-                , input [ class "form_input", placeholder "Units (optional)", value model.tempUnit, onInput ChangeTempUnit ] []
-                , input [ class "form_input", placeholder "Ingredient", value model.tempFood, onInput ChangeTempFood ] []
-                ]
-            ]
+        [ div [class "ingredientInput", onKeyDown KeyDown ] [
+            input [ placeholder "Input", value model.total, onInput ChangeTotal] []
+        ]
         , div [ class "slider" ]
             [ div [] [ text (String.fromFloat model.sliderVal) ]
             , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
@@ -190,12 +164,12 @@ view model =
                 ([ h5 [] [ text "recipe" ]
                 ]
 
-                    ++ viewIngredientsLeft model.ingredients
+                    ++ newViewIngredientsLeft model.listNewIngredients
                 )
             , div [ class "recipeContainerRight" ]
                 ([ h6 [] [ text "scaled" ]
                  ]
-                    ++ viewIngredientsRight model.newIngredients
+                    ++ newViewIngredientsRight model.changedNewIngs
                 )
             ]
         ]
@@ -206,47 +180,32 @@ onKeyDown tagger =
     on "keydown" (Json.map tagger keyCode)
 
 
-viewIngredientsLeft : List Ingredient -> List (Html Msg)
-viewIngredientsLeft lst =
+
+
+
+newViewIngredientsLeft : List NewIngredient -> List (Html Msg)
+newViewIngredientsLeft lst =
     case lst of
         [] ->
             []
 
         food :: foods ->
-            if String.isEmpty food.unit then
-                [ div []
-                    [ button [onClick (Delete food)] [text "X"]
-                    , h3 [] [ text (food.quantity ++ " " ++ food.food) ]
-                    ]
+            [ div []
+                [ button [onClick (Delete food)] [text "X"]
+                , h3 [] [ text ((String.fromFloat (food.quantity)) ++ " " ++ food.food) ]
                 ]
-                    ++ viewIngredientsLeft foods
+            ]
+                ++ newViewIngredientsLeft foods
 
-            else
-                [ div []
-                    [ button [onClick (Delete food)] [text "X"]
-                    ,  h3 [] [ text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food) ]
-                    ]
-                ]
-                    ++ viewIngredientsLeft foods
-
-
-viewIngredientsRight : List Ingredient -> List (Html Msg)
-viewIngredientsRight lst =
+newViewIngredientsRight : List NewIngredient -> List (Html Msg)
+newViewIngredientsRight lst =
     case lst of
         [] ->
             []
 
         food :: foods ->
-            if String.isEmpty food.unit then
-                [ div []
-                    [ h4 [] [ text (food.quantity ++ " " ++ food.food) ]
-                    ]
+            [ div []
+                [ h4 [] [ text ((String.fromFloat (food.quantity)) ++ " " ++ food.food) ]
                 ]
-                    ++ viewIngredientsRight foods
-
-            else
-                [ div []
-                    [ h4 [] [ text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food) ]
-                    ]
-                ]
-                    ++ viewIngredientsRight foods
+            ]
+                ++ newViewIngredientsRight foods
