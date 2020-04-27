@@ -185,10 +185,11 @@ view model =
             [ div [] [ text (String.fromFloat model.sliderVal) ]
             , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
             ]
-        , div [ class "grid-divider" ]
+        , div []
             [ div [ class "recipeContainer" ]
                 ([ h5 [] [ text "recipe" ]
                 ]
+
                     ++ viewIngredientsLeft model.ingredients
                 )
             , div [ class "recipeContainerRight" ]
