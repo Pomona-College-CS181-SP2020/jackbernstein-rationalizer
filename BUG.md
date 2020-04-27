@@ -39,13 +39,13 @@ Fix: Switched to Elm 0.19.0, Node 9
 
 Problem: Can't go back to 0 when rationalizing
 
-Fix: TBD
+Fix: Allow user to put in any input
 
 # 4-24-2020
 
 Problem: Input won't reset to 0 when select is changed 
 
-Fix: TBD
+Fix: Didn't need to fix because removed menu
 
 # 4-24-2020
 
@@ -57,7 +57,7 @@ Fix: Moved method call from option to select
 
 Problem: Bugs when selecting ingredient to rationalize around
 
-Fix: TBD
+Fix: Changed overall logic, bug disappeared 
 
 
 

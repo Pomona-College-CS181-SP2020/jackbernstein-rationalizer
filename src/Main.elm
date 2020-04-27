@@ -159,26 +159,25 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [ class "ingredientInput" ]
-            [ text "Add ingredient"
+            [ h6 [] [text "Add ingredient"]
             , div [ onKeyDown KeyDown ]
-                [ input [ placeholder "Quantity", value model.tempQuant, onInput ChangeTempQuant ] []
-                , input [ placeholder "Units (optional)", value model.tempUnit, onInput ChangeTempUnit ] []
-                , input [ placeholder "Ingredient", value model.tempFood, onInput ChangeTempFood ] []
+                [ input [ class "form_input", placeholder "Quantity", value model.tempQuant, onInput ChangeTempQuant ] []
+                , input [ class "form_input", placeholder "Units (optional)", value model.tempUnit, onInput ChangeTempUnit ] []
+                , input [ class "form_input", placeholder "Ingredient", value model.tempFood, onInput ChangeTempFood ] []
                 ]
             ]
         , div [ class "slider" ]
             [ div [] [ text (String.fromFloat model.sliderVal) ]
             , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
             ]
-        , div []
+        , div [class "grid-divider"]
             [ div [ class "recipeContainer" ]
-                ([ text "recipe"
+                ([ h6 [] [text "recipe"]
                  ]
                     ++ viewIngredients model.ingredients
                 )
-            , div [ class "filler " ] [ text "test" ]
-            , div [ class "recipeContainer" ]
-                ([ text "scaled"
+            , div [ class "recipeContainerRight" ]
+                ([ h6 [] [text "scaled"]
                  ]
                     ++ viewIngredients model.newIngredients
                 )

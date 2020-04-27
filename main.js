@@ -5523,7 +5523,7 @@ var $author$project$Main$newMapIngredients = F2(
 					_Utils_update(
 						food,
 						{
-							quantity: A2($myrho$elm_round$Round$round, 2, x * flt)
+							quantity: A2($myrho$elm_round$Round$round, 1, x * flt)
 						}),
 					A2($author$project$Main$newMapIngredients, foods, flt));
 			}
@@ -5657,6 +5657,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$h6 = _VirtualDom_node('h6');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
 var $elm$html$Html$Attributes$min = $elm$html$Html$Attributes$stringProperty('min');
@@ -5765,7 +5766,13 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Add ingredient'),
+						A2(
+						$elm$html$Html$h6,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Add ingredient')
+							])),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
@@ -5778,6 +5785,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$input,
 								_List_fromArray(
 									[
+										$elm$html$Html$Attributes$class('form_input'),
 										$elm$html$Html$Attributes$placeholder('Quantity'),
 										$elm$html$Html$Attributes$value(model.tempQuant),
 										$elm$html$Html$Events$onInput($author$project$Main$ChangeTempQuant)
@@ -5787,6 +5795,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$input,
 								_List_fromArray(
 									[
+										$elm$html$Html$Attributes$class('form_input'),
 										$elm$html$Html$Attributes$placeholder('Units (optional)'),
 										$elm$html$Html$Attributes$value(model.tempUnit),
 										$elm$html$Html$Events$onInput($author$project$Main$ChangeTempUnit)
@@ -5796,6 +5805,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$input,
 								_List_fromArray(
 									[
+										$elm$html$Html$Attributes$class('form_input'),
 										$elm$html$Html$Attributes$placeholder('Ingredient'),
 										$elm$html$Html$Attributes$value(model.tempFood),
 										$elm$html$Html$Events$onInput($author$project$Main$ChangeTempFood)
@@ -5836,7 +5846,10 @@ var $author$project$Main$view = function (model) {
 					])),
 				A2(
 				$elm$html$Html$div,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('grid-divider')
+					]),
 				_List_fromArray(
 					[
 						A2(
@@ -5848,29 +5861,31 @@ var $author$project$Main$view = function (model) {
 						_Utils_ap(
 							_List_fromArray(
 								[
-									$elm$html$Html$text('recipe')
+									A2(
+									$elm$html$Html$h6,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('recipe')
+										]))
 								]),
 							$author$project$Main$viewIngredients(model.ingredients))),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('filler ')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('test')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('recipeContainer')
+								$elm$html$Html$Attributes$class('recipeContainerRight')
 							]),
 						_Utils_ap(
 							_List_fromArray(
 								[
-									$elm$html$Html$text('scaled')
+									A2(
+									$elm$html$Html$h6,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('scaled')
+										]))
 								]),
 							$author$project$Main$viewIngredients(model.newIngredients)))
 					]))
