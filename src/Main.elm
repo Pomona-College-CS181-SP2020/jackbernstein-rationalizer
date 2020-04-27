@@ -79,11 +79,15 @@ type Msg
     | Scale Float
     | KeyDown Int
     | UpdateSlider String
+    | Delete Ingredient
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
+        Delete food -> 
+            {model | ingredients = del model.ingredients food, newIngredients = newMapIngredients ( del model.ingredients food) model.sliderVal}
+
         UpdateSlider strng ->
             case String.toFloat strng of
                 Just x ->
@@ -120,6 +124,18 @@ update msg model =
 
         Scale flt ->
             { model | newIngredients = newMapIngredients model.newIngredients flt }
+
+
+del : List Ingredient -> Ingredient -> List Ingredient 
+del lst food =
+    case lst of 
+        [] -> 
+            []
+        
+        ing :: ings -> 
+            if food == ing
+            then ings
+            else ing :: del ings food 
 
 
 verifyAdd : Model -> Ingredient -> Model
@@ -172,7 +188,7 @@ view model =
         , div [ class "grid-divider" ]
             [ div [ class "recipeContainer" ]
                 ([ h5 [] [ text "recipe" ]
-                 ]
+                ]
                     ++ viewIngredientsLeft model.ingredients
                 )
             , div [ class "recipeContainerRight" ]
@@ -198,14 +214,16 @@ viewIngredientsLeft lst =
         food :: foods ->
             if String.isEmpty food.unit then
                 [ div []
-                    [ h3 [] [ text (food.quantity ++ " " ++ food.food) ]
+                    [ button [onClick (Delete food)] [text "X"]
+                    , h3 [] [ text (food.quantity ++ " " ++ food.food) ]
                     ]
                 ]
                     ++ viewIngredientsLeft foods
 
             else
                 [ div []
-                    [ h3 [] [ text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food) ]
+                    [ button [onClick (Delete food)] [text "X"]
+                    ,  h3 [] [ text (food.quantity ++ " " ++ food.unit ++ " of " ++ food.food) ]
                     ]
                 ]
                     ++ viewIngredientsLeft foods

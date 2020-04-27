@@ -5218,6 +5218,19 @@ var $elm$browser$Browser$sandbox = function (impl) {
 var $author$project$Main$AddToList = function (a) {
 	return {$: 'AddToList', a: a};
 };
+var $author$project$Main$del = F2(
+	function (lst, food) {
+		if (!lst.b) {
+			return _List_Nil;
+		} else {
+			var ing = lst.a;
+			var ings = lst.b;
+			return _Utils_eq(food, ing) ? ings : A2(
+				$elm$core$List$cons,
+				ing,
+				A2($author$project$Main$del, ings, food));
+		}
+	});
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Basics$not = _Basics_not;
 var $elm$core$Basics$negate = function (n) {
@@ -5571,6 +5584,17 @@ var $author$project$Main$update = F2(
 		update:
 		while (true) {
 			switch (msg.$) {
+				case 'Delete':
+					var food = msg.a;
+					return _Utils_update(
+						model,
+						{
+							ingredients: A2($author$project$Main$del, model.ingredients, food),
+							newIngredients: A2(
+								$author$project$Main$newMapIngredients,
+								A2($author$project$Main$del, model.ingredients, food),
+								model.sliderVal)
+						});
 				case 'UpdateSlider':
 					var strng = msg.a;
 					var _v1 = $elm$core$String$toFloat(strng);
@@ -5722,7 +5746,17 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$Delete = function (a) {
+	return {$: 'Delete', a: a};
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $author$project$Main$viewIngredientsLeft = function (lst) {
 	if (!lst.b) {
 		return _List_Nil;
@@ -5737,6 +5771,17 @@ var $author$project$Main$viewIngredientsLeft = function (lst) {
 					_List_Nil,
 					_List_fromArray(
 						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$Delete(food))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('X')
+								])),
 							A2(
 							$elm$html$Html$h3,
 							_List_Nil,
@@ -5754,6 +5799,17 @@ var $author$project$Main$viewIngredientsLeft = function (lst) {
 					_List_Nil,
 					_List_fromArray(
 						[
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$Delete(food))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('X')
+								])),
 							A2(
 							$elm$html$Html$h3,
 							_List_Nil,
