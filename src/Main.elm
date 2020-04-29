@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
+import Parser exposing ((|.), (|=), Parser, float, spaces, succeed, symbol)
 import Round exposing (..)
 
 
@@ -20,9 +21,9 @@ main =
 -- MODEL
 
 
-type alias NewIngredient = 
+type alias NewIngredient =
     { food : String
-    , quantity : Float 
+    , quantity : Float
     }
 
 
@@ -81,23 +82,35 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        AddNewIngredient -> 
-            { model | listNewIngredients = model.listNewIngredients ++ [{food = model.total, quantity = 1.0}], changedNewIngs = model.changedNewIngs ++ [{food = model.total, quantity = 1.0 * model.sliderVal}],  total = ""}
+        AddNewIngredient ->
+            case numberPresentHelper (String.words model.total) of
+                Just x ->
+                    let
+                        lstOfRest =
+                            removeNumber (String.words model.total)
+
+                        restOfString =
+                            String.join " " lstOfRest
+                    in
+                    { model | listNewIngredients = model.listNewIngredients ++ [ { food = restOfString, quantity = x } ], changedNewIngs = model.changedNewIngs ++ [ { food = restOfString, quantity = x * model.sliderVal } ], total = "" }
+
+                Nothing ->
+                    model
 
         ChangeTotal tot ->
-            { model | total = tot}
+            { model | total = tot }
 
         UpdateSlider strng ->
             case String.toFloat strng of
                 Just x ->
-                    { model | sliderVal = x, changedNewIngs = scale model.listNewIngredients x}
+                    { model | sliderVal = x, changedNewIngs = scale model.listNewIngredients x }
 
                 Nothing ->
                     model
 
         KeyDown key ->
             if key == 13 then
-                update AddNewIngredient model 
+                update AddNewIngredient model
 
             else
                 model
@@ -121,28 +134,62 @@ update msg model =
         Scale flt ->
             model
 
-        Delete food -> 
-            { model | listNewIngredients = del model.listNewIngredients food, changedNewIngs = del model.changedNewIngs food}
+        Delete food ->
+            { model | listNewIngredients = del model.listNewIngredients food, changedNewIngs = del model.changedNewIngs food }
 
-del : List NewIngredient -> NewIngredient -> List NewIngredient
-del lst ing = 
-    case lst of 
+
+removeNumber : List String -> List String
+removeNumber lst =
+    case lst of
         [] ->
             []
 
-        food :: foods -> 
-            if food.food == ing.food
-            then foods 
-            else food :: del foods ing
+        fst :: rst ->
+            case Parser.run float fst of
+                Ok x ->
+                    rst
 
-scale : List NewIngredient -> Float -> List NewIngredient 
-scale lst flt = 
-    case lst of 
-        [] -> 
+                _ ->
+                    fst :: removeNumber rst
+
+
+numberPresentHelper : List String -> Maybe Float
+numberPresentHelper lst =
+    case lst of
+        [] ->
+            Nothing
+
+        fst :: rst ->
+            case Parser.run float fst of
+                Ok x ->
+                    Just x
+
+                _ ->
+                    numberPresentHelper rst
+
+
+del : List NewIngredient -> NewIngredient -> List NewIngredient
+del lst ing =
+    case lst of
+        [] ->
             []
 
-        ing :: ings -> 
-            {ing | quantity = ing.quantity * flt} :: scale ings flt
+        food :: foods ->
+            if food.food == ing.food then
+                foods
+
+            else
+                food :: del foods ing
+
+
+scale : List NewIngredient -> Float -> List NewIngredient
+scale lst flt =
+    case lst of
+        [] ->
+            []
+
+        ing :: ings ->
+            { ing | quantity = ing.quantity * flt } :: scale ings flt
 
 
 
@@ -152,9 +199,9 @@ scale lst flt =
 view : Model -> Html Msg
 view model =
     div []
-        [ div [class "ingredientInput", onKeyDown KeyDown ] [
-            input [ placeholder "Input", value model.total, onInput ChangeTotal] []
-        ]
+        [ div [ class "ingredientInput", onKeyDown KeyDown ]
+            [ input [ placeholder "Input", value model.total, onInput ChangeTotal ] []
+            ]
         , div [ class "slider" ]
             [ div [] [ text (String.fromFloat model.sliderVal) ]
             , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
@@ -162,8 +209,7 @@ view model =
         , div []
             [ div [ class "recipeContainer" ]
                 ([ h5 [] [ text "recipe" ]
-                ]
-
+                 ]
                     ++ newViewIngredientsLeft model.listNewIngredients
                 )
             , div [ class "recipeContainerRight" ]
@@ -180,9 +226,6 @@ onKeyDown tagger =
     on "keydown" (Json.map tagger keyCode)
 
 
-
-
-
 newViewIngredientsLeft : List NewIngredient -> List (Html Msg)
 newViewIngredientsLeft lst =
     case lst of
@@ -191,11 +234,12 @@ newViewIngredientsLeft lst =
 
         food :: foods ->
             [ div []
-                [ button [onClick (Delete food)] [text "X"]
-                , h3 [] [ text ((String.fromFloat (food.quantity)) ++ " " ++ food.food) ]
+                [ button [ onClick (Delete food) ] [ text "X" ]
+                , h3 [] [ text (String.fromFloat food.quantity ++ " " ++ food.food) ]
                 ]
             ]
                 ++ newViewIngredientsLeft foods
+
 
 newViewIngredientsRight : List NewIngredient -> List (Html Msg)
 newViewIngredientsRight lst =
@@ -205,7 +249,7 @@ newViewIngredientsRight lst =
 
         food :: foods ->
             [ div []
-                [ h4 [] [ text ((String.fromFloat (food.quantity)) ++ " " ++ food.food) ]
+                [ h4 [] [ text (String.fromFloat food.quantity ++ " " ++ food.food) ]
                 ]
             ]
                 ++ newViewIngredientsRight foods
