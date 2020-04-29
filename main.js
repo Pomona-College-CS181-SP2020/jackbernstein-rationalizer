@@ -4603,7 +4603,7 @@ var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$Basics$False = {$: 'False'};
-var $author$project$Main$init = {changedNewIngs: _List_Nil, emptyName: false, invalidQuant: false, listNewIngredients: _List_Nil, optionFood: '', optionNumb: '', sliderVal: 1.0, tempFood: '', tempQuant: '', tempUnit: '', total: ''};
+var $author$project$Main$init = {changedNewIngs: _List_Nil, listNewIngredients: _List_Nil, noQuantFound: false, optionFood: '', optionNumb: '', sliderVal: 1.0, tempFood: '', tempQuant: '', tempUnit: '', total: ''};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -5698,6 +5698,7 @@ var $author$project$Main$update = F2(
 										[
 											{food: model.total, quantity: 1, quantityPresent: false}
 										])),
+								noQuantFound: true,
 								total: ''
 							});
 					}
@@ -5705,7 +5706,7 @@ var $author$project$Main$update = F2(
 					var tot = msg.a;
 					return _Utils_update(
 						model,
-						{total: tot});
+						{noQuantFound: false, total: tot});
 				case 'UpdateSlider':
 					var strng = msg.a;
 					var _v2 = $elm$core$String$toFloat(strng);
@@ -6343,7 +6344,127 @@ var $elm$html$Html$Attributes$step = function (n) {
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
-	return A2(
+	return model.noQuantFound ? A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('ingredientInput2'),
+						$author$project$Main$onKeyDown($author$project$Main$KeyDown)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('bigFont')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Input an ingredient with a quantity, then hit enter')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$placeholder('3 teaspoons of sugar'),
+										$elm$html$Html$Attributes$value(model.total),
+										$elm$html$Html$Events$onInput($author$project$Main$ChangeTotal)
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Ingredient will not be scaled because no quantity was found')
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('slider')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromFloat(model.sliderVal))
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('range'),
+								$elm$html$Html$Attributes$min('.1'),
+								$elm$html$Html$Attributes$max('10'),
+								$elm$html$Html$Attributes$value(
+								$elm$core$String$fromFloat(model.sliderVal)),
+								$elm$html$Html$Attributes$step('.1'),
+								$elm$html$Html$Attributes$class('sliderConfig'),
+								$elm$html$Html$Events$onInput($author$project$Main$UpdateSlider)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('recipeContainer')
+							]),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$h5,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Original Recipe')
+										]))
+								]),
+							$author$project$Main$newViewIngredientsLeft(model.listNewIngredients))),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('recipeContainerRight')
+							]),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$h6,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Scaled Recipe')
+										]))
+								]),
+							$author$project$Main$newViewIngredientsRight(model.changedNewIngs)))
+					]))
+			])) : A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
@@ -6358,10 +6479,20 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('bigFont')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Input an ingredient with a quantity, then hit enter')
+							])),
+						A2(
 						$elm$html$Html$input,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$placeholder('Input'),
+								$elm$html$Html$Attributes$placeholder('3 teaspoons of sugar'),
 								$elm$html$Html$Attributes$value(model.total),
 								$elm$html$Html$Events$onInput($author$project$Main$ChangeTotal)
 							]),
@@ -6417,7 +6548,7 @@ var $author$project$Main$view = function (model) {
 									_List_Nil,
 									_List_fromArray(
 										[
-											$elm$html$Html$text('recipe')
+											$elm$html$Html$text('Original Recipe')
 										]))
 								]),
 							$author$project$Main$newViewIngredientsLeft(model.listNewIngredients))),
@@ -6435,7 +6566,7 @@ var $author$project$Main$view = function (model) {
 									_List_Nil,
 									_List_fromArray(
 										[
-											$elm$html$Html$text('scaled')
+											$elm$html$Html$text('Scaled Recipe')
 										]))
 								]),
 							$author$project$Main$newViewIngredientsRight(model.changedNewIngs)))

@@ -34,12 +34,11 @@ type alias Recipe =
     , tempUnit : String
     , optionFood : String
     , optionNumb : String
-    , emptyName : Bool
-    , invalidQuant : Bool
     , sliderVal : Float
     , total : String
     , listNewIngredients : List NewIngredient
     , changedNewIngs : List NewIngredient
+    , noQuantFound : Bool
     }
 
 
@@ -54,12 +53,11 @@ init =
     , tempUnit = ""
     , optionFood = ""
     , optionNumb = ""
-    , emptyName = False
-    , invalidQuant = False
     , sliderVal = 1.0
     , total = ""
     , listNewIngredients = []
     , changedNewIngs = []
+    , noQuantFound = False
     }
 
 
@@ -108,10 +106,11 @@ update msg model =
                             | listNewIngredients = model.listNewIngredients ++ [ { food = model.total, quantity = 1, quantityPresent = False } ]
                             , changedNewIngs = model.changedNewIngs ++ [ { food = model.total, quantity = 1, quantityPresent = False } ]
                             , total = ""
+                            , noQuantFound = True
                         }
 
         ChangeTotal tot ->
-            { model | total = tot }
+            { model | total = tot, noQuantFound = False }
 
         UpdateSlider strng ->
             case String.toFloat strng of
@@ -211,27 +210,54 @@ scale lst flt =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [ class "ingredientInput", onKeyDown KeyDown ]
-            [ input [ placeholder "Input", value model.total, onInput ChangeTotal ] []
+    if model.noQuantFound then
+        div []
+            [ div [ class "ingredientInput2", onKeyDown KeyDown ]
+                [ div [ class "bigFont" ] [ text "Input an ingredient with a quantity, then hit enter" ]
+                , div [] [ input [ placeholder "3 teaspoons of sugar", value model.total, onInput ChangeTotal ] [] ]
+                , div [] [ text "Ingredient will not be scaled because no quantity was found" ]
+                ]
+            , div [ class "slider" ]
+                [ div [] [ text (String.fromFloat model.sliderVal) ]
+                , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
+                ]
+            , div []
+                [ div [ class "recipeContainer" ]
+                    ([ h5 [] [ text "Original Recipe" ]
+                     ]
+                        ++ newViewIngredientsLeft model.listNewIngredients
+                    )
+                , div [ class "recipeContainerRight" ]
+                    ([ h6 [] [ text "Scaled Recipe" ]
+                     ]
+                        ++ newViewIngredientsRight model.changedNewIngs
+                    )
+                ]
             ]
-        , div [ class "slider" ]
-            [ div [] [ text (String.fromFloat model.sliderVal) ]
-            , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
+
+    else
+        div []
+            [ div [ class "ingredientInput", onKeyDown KeyDown ]
+                [ div [ class "bigFont" ] [ text "Input an ingredient with a quantity, then hit enter" ]
+                , input [ placeholder "3 teaspoons of sugar", value model.total, onInput ChangeTotal ] []
+                ]
+            , div [ class "slider" ]
+                [ div [] [ text (String.fromFloat model.sliderVal) ]
+                , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
+                ]
+            , div []
+                [ div [ class "recipeContainer" ]
+                    ([ h5 [] [ text "Original Recipe" ]
+                     ]
+                        ++ newViewIngredientsLeft model.listNewIngredients
+                    )
+                , div [ class "recipeContainerRight" ]
+                    ([ h6 [] [ text "Scaled Recipe" ]
+                     ]
+                        ++ newViewIngredientsRight model.changedNewIngs
+                    )
+                ]
             ]
-        , div []
-            [ div [ class "recipeContainer" ]
-                ([ h5 [] [ text "recipe" ]
-                 ]
-                    ++ newViewIngredientsLeft model.listNewIngredients
-                )
-            , div [ class "recipeContainerRight" ]
-                ([ h6 [] [ text "scaled" ]
-                 ]
-                    ++ newViewIngredientsRight model.changedNewIngs
-                )
-            ]
-        ]
 
 
 onKeyDown : (Int -> msg) -> Attribute msg
