@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
-import Parser exposing ((|.), (|=), Parser, float, spaces, succeed, symbol)
+import Parser exposing ((|.), (|=), Parser, float, int, spaces, succeed, symbol)
 import Round exposing (..)
 
 
@@ -24,6 +24,7 @@ main =
 type alias NewIngredient =
     { food : String
     , quantity : Float
+    , quantityPresent : Bool
     }
 
 
@@ -92,10 +93,22 @@ update msg model =
                         restOfString =
                             String.join " " lstOfRest
                     in
-                    { model | listNewIngredients = model.listNewIngredients ++ [ { food = restOfString, quantity = x } ], changedNewIngs = model.changedNewIngs ++ [ { food = restOfString, quantity = x * model.sliderVal } ], total = "" }
+                    { model
+                        | listNewIngredients = model.listNewIngredients ++ [ { food = restOfString, quantity = x, quantityPresent = True } ]
+                        , changedNewIngs = model.changedNewIngs ++ [ { food = restOfString, quantity = x * model.sliderVal, quantityPresent = True } ]
+                        , total = ""
+                    }
 
                 Nothing ->
-                    model
+                    if String.isEmpty model.total then
+                        model
+
+                    else
+                        { model
+                            | listNewIngredients = model.listNewIngredients ++ [ { food = model.total, quantity = 1, quantityPresent = False } ]
+                            , changedNewIngs = model.changedNewIngs ++ [ { food = model.total, quantity = 1, quantityPresent = False } ]
+                            , total = ""
+                        }
 
         ChangeTotal tot ->
             { model | total = tot }
@@ -233,12 +246,31 @@ newViewIngredientsLeft lst =
             []
 
         food :: foods ->
-            [ div []
-                [ button [ onClick (Delete food) ] [ text "X" ]
-                , h3 [] [ text (String.fromFloat food.quantity ++ " " ++ food.food) ]
+            if food.quantityPresent then
+                case Parser.run int (String.fromFloat food.quantity) of
+                    Ok x ->
+                        [ div []
+                            [ button [ onClick (Delete food) ] [ text "X" ]
+                            , h3 [] [ text (String.fromFloat food.quantity ++ " " ++ food.food) ]
+                            ]
+                        ]
+                            ++ newViewIngredientsLeft foods
+
+                    _ ->
+                        [ div []
+                            [ button [ onClick (Delete food) ] [ text "X" ]
+                            , h3 [] [ text (Round.round 1 food.quantity ++ " " ++ food.food) ]
+                            ]
+                        ]
+                            ++ newViewIngredientsLeft foods
+
+            else
+                [ div []
+                    [ button [ onClick (Delete food) ] [ text "X" ]
+                    , h3 [] [ text food.food ]
+                    ]
                 ]
-            ]
-                ++ newViewIngredientsLeft foods
+                    ++ newViewIngredientsLeft foods
 
 
 newViewIngredientsRight : List NewIngredient -> List (Html Msg)
@@ -248,8 +280,25 @@ newViewIngredientsRight lst =
             []
 
         food :: foods ->
-            [ div []
-                [ h4 [] [ text (String.fromFloat food.quantity ++ " " ++ food.food) ]
+            if food.quantityPresent then
+                case Parser.run int (String.fromFloat food.quantity) of
+                    Ok x ->
+                        [ div []
+                            [ h4 [] [ text (String.fromFloat food.quantity ++ " " ++ food.food) ]
+                            ]
+                        ]
+                            ++ newViewIngredientsRight foods
+
+                    _ ->
+                        [ div []
+                            [ h4 [] [ text (Round.round 1 food.quantity ++ " " ++ food.food) ]
+                            ]
+                        ]
+                            ++ newViewIngredientsRight foods
+
+            else
+                [ div []
+                    [ h4 [] [ text food.food ]
+                    ]
                 ]
-            ]
-                ++ newViewIngredientsRight foods
+                    ++ newViewIngredientsRight foods
