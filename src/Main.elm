@@ -76,11 +76,15 @@ type Msg
     | ChangeTotal String
     | AddNewIngredient
     | Delete NewIngredient
+    | ScaleIngredient String
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
+        ScaleIngredient strng -> 
+            model
+
         AddNewIngredient ->
             case numberPresentHelper (String.words model.total) of
                 Just x ->
@@ -95,6 +99,7 @@ update msg model =
                         | listNewIngredients = model.listNewIngredients ++ [ { food = restOfString, quantity = x, quantityPresent = True } ]
                         , changedNewIngs = model.changedNewIngs ++ [ { food = restOfString, quantity = x * model.sliderVal, quantityPresent = True } ]
                         , total = ""
+                        , noQuantFound = False
                     }
 
                 Nothing ->
@@ -110,7 +115,7 @@ update msg model =
                         }
 
         ChangeTotal tot ->
-            { model | total = tot, noQuantFound = False }
+            { model | total = tot}
 
         UpdateSlider strng ->
             case String.toFloat strng of
@@ -243,7 +248,7 @@ view model =
                 ]
             , div [ class "slider" ]
                 [ div [] [ text (String.fromFloat model.sliderVal) ]
-                , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
+                , input [ type_ "range", Html.Attributes.min ".01", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".01", class "sliderConfig", onInput UpdateSlider ] []
                 ]
             , div []
                 [ div [ class "recipeContainer" ]
@@ -310,14 +315,16 @@ newViewIngredientsRight lst =
                 case Parser.run int (String.fromFloat food.quantity) of
                     Ok x ->
                         [ div []
-                            [ h4 [] [ text (String.fromFloat food.quantity ++ " " ++ food.food) ]
+                            [ input [class "indivIng", value (String.fromFloat food.quantity), onInput ScaleIngredient] [] 
+                            , h4 [] [ text (" " ++ food.food) ]
                             ]
                         ]
                             ++ newViewIngredientsRight foods
 
                     _ ->
                         [ div []
-                            [ h4 [] [ text (Round.round 1 food.quantity ++ " " ++ food.food) ]
+                            [ input [class "indivIng", value (String.fromFloat food.quantity), onInput ScaleIngredient] []
+                            , h4 [] [ text (" " ++ food.food) ]
                             ]
                         ]
                             ++ newViewIngredientsRight foods

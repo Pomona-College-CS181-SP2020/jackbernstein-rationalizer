@@ -5657,6 +5657,9 @@ var $author$project$Main$update = F2(
 		update:
 		while (true) {
 			switch (msg.$) {
+				case 'ScaleIngredient':
+					var strng = msg.a;
+					return model;
 				case 'AddNewIngredient':
 					var _v1 = $author$project$Main$numberPresentHelper(
 						$elm$core$String$words(model.total));
@@ -5680,6 +5683,7 @@ var $author$project$Main$update = F2(
 										[
 											{food: restOfString, quantity: x, quantityPresent: true}
 										])),
+								noQuantFound: false,
 								total: ''
 							});
 					} else {
@@ -5706,7 +5710,7 @@ var $author$project$Main$update = F2(
 					var tot = msg.a;
 					return _Utils_update(
 						model,
-						{noQuantFound: false, total: tot});
+						{total: tot});
 				case 'UpdateSlider':
 					var strng = msg.a;
 					var _v2 = $elm$core$String$toFloat(strng);
@@ -6220,82 +6224,10 @@ var $author$project$Main$newViewIngredientsLeft = function (lst) {
 		}
 	}
 };
-var $elm$html$Html$h4 = _VirtualDom_node('h4');
-var $author$project$Main$newViewIngredientsRight = function (lst) {
-	if (!lst.b) {
-		return _List_Nil;
-	} else {
-		var food = lst.a;
-		var foods = lst.b;
-		if (food.quantityPresent) {
-			var _v1 = A2(
-				$elm$parser$Parser$run,
-				$elm$parser$Parser$int,
-				$elm$core$String$fromFloat(food.quantity));
-			if (_v1.$ === 'Ok') {
-				var x = _v1.a;
-				return _Utils_ap(
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$div,
-							_List_Nil,
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$h4,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											$elm$core$String$fromFloat(food.quantity) + (' ' + food.food))
-										]))
-								]))
-						]),
-					$author$project$Main$newViewIngredientsRight(foods));
-			} else {
-				return _Utils_ap(
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$div,
-							_List_Nil,
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$h4,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											A2($myrho$elm_round$Round$round, 1, food.quantity) + (' ' + food.food))
-										]))
-								]))
-						]),
-					$author$project$Main$newViewIngredientsRight(foods));
-			}
-		} else {
-			return _Utils_ap(
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$h4,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text(food.food)
-									]))
-							]))
-					]),
-				$author$project$Main$newViewIngredientsRight(foods));
-		}
-	}
+var $author$project$Main$ScaleIngredient = function (a) {
+	return {$: 'ScaleIngredient', a: a};
 };
+var $elm$html$Html$h4 = _VirtualDom_node('h4');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -6329,6 +6261,100 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$newViewIngredientsRight = function (lst) {
+	if (!lst.b) {
+		return _List_Nil;
+	} else {
+		var food = lst.a;
+		var foods = lst.b;
+		if (food.quantityPresent) {
+			var _v1 = A2(
+				$elm$parser$Parser$run,
+				$elm$parser$Parser$int,
+				$elm$core$String$fromFloat(food.quantity));
+			if (_v1.$ === 'Ok') {
+				var x = _v1.a;
+				return _Utils_ap(
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('indivIng'),
+											$elm$html$Html$Attributes$value(
+											$elm$core$String$fromFloat(food.quantity)),
+											$elm$html$Html$Events$onInput($author$project$Main$ScaleIngredient)
+										]),
+									_List_Nil),
+									A2(
+									$elm$html$Html$h4,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(' ' + food.food)
+										]))
+								]))
+						]),
+					$author$project$Main$newViewIngredientsRight(foods));
+			} else {
+				return _Utils_ap(
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('indivIng'),
+											$elm$html$Html$Attributes$value(
+											$elm$core$String$fromFloat(food.quantity)),
+											$elm$html$Html$Events$onInput($author$project$Main$ScaleIngredient)
+										]),
+									_List_Nil),
+									A2(
+									$elm$html$Html$h4,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(' ' + food.food)
+										]))
+								]))
+						]),
+					$author$project$Main$newViewIngredientsRight(foods));
+			}
+		} else {
+			return _Utils_ap(
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$h4,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(food.food)
+									]))
+							]))
+					]),
+				$author$project$Main$newViewIngredientsRight(foods));
+		}
+	}
+};
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$html$Html$Events$keyCode = A2($elm$json$Json$Decode$field, 'keyCode', $elm$json$Json$Decode$int);
 var $author$project$Main$onKeyDown = function (tagger) {
@@ -6342,7 +6368,6 @@ var $elm$html$Html$Attributes$step = function (n) {
 	return A2($elm$html$Html$Attributes$stringProperty, 'step', n);
 };
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
 	return model.noQuantFound ? A2(
 		$elm$html$Html$div,
@@ -6519,11 +6544,11 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$type_('range'),
-								$elm$html$Html$Attributes$min('.1'),
-								$elm$html$Html$Attributes$max('10'),
+								$elm$html$Html$Attributes$min('.01'),
+								$elm$html$Html$Attributes$max('20'),
 								$elm$html$Html$Attributes$value(
 								$elm$core$String$fromFloat(model.sliderVal)),
-								$elm$html$Html$Attributes$step('.1'),
+								$elm$html$Html$Attributes$step('.01'),
 								$elm$html$Html$Attributes$class('sliderConfig'),
 								$elm$html$Html$Events$onInput($author$project$Main$UpdateSlider)
 							]),
