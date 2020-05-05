@@ -5347,6 +5347,7 @@ var $author$project$Main$del = F2(
 				A2($author$project$Main$del, foods, ing));
 		}
 	});
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$parser$Parser$ExpectingFloat = {$: 'ExpectingFloat'};
 var $elm$parser$Parser$Advanced$Parser = function (a) {
 	return {$: 'Parser', a: a};
@@ -5636,6 +5637,24 @@ var $author$project$Main$removeNumber = function (lst) {
 		}
 	}
 };
+var $author$project$Main$replaceFood = F3(
+	function (originalLst, food, newQuant) {
+		if (!originalLst.b) {
+			return _List_Nil;
+		} else {
+			var ing = originalLst.a;
+			var ings = originalLst.b;
+			return _Utils_eq(ing, food) ? A2(
+				$elm$core$List$cons,
+				_Utils_update(
+					ing,
+					{quantity: newQuant}),
+				ings) : A2(
+				$elm$core$List$cons,
+				ing,
+				A3($author$project$Main$replaceFood, ings, food, newQuant));
+		}
+	});
 var $author$project$Main$scale = F2(
 	function (lst, flt) {
 		if (!lst.b) {
@@ -5643,12 +5662,23 @@ var $author$project$Main$scale = F2(
 		} else {
 			var ing = lst.a;
 			var ings = lst.b;
-			return A2(
-				$elm$core$List$cons,
-				_Utils_update(
+			var _v1 = $elm$core$String$toFloat(ing.quantity);
+			if (_v1.$ === 'Just') {
+				var x = _v1.a;
+				return A2(
+					$elm$core$List$cons,
+					_Utils_update(
+						ing,
+						{
+							quantity: $elm$core$String$fromFloat(x * flt)
+						}),
+					A2($author$project$Main$scale, ings, flt));
+			} else {
+				return A2(
+					$elm$core$List$cons,
 					ing,
-					{quantity: ing.quantity * flt}),
-				A2($author$project$Main$scale, ings, flt));
+					A2($author$project$Main$scale, ings, flt));
+			}
 		}
 	});
 var $elm$core$String$words = _String_words;
@@ -5658,13 +5688,28 @@ var $author$project$Main$update = F2(
 		while (true) {
 			switch (msg.$) {
 				case 'ScaleIngredient':
-					var strng = msg.a;
-					return model;
-				case 'AddNewIngredient':
-					var _v1 = $author$project$Main$numberPresentHelper(
-						$elm$core$String$words(model.total));
-					if (_v1.$ === 'Just') {
+					var food = msg.a;
+					var strng = msg.b;
+					var _v1 = $elm$core$String$toFloat(strng);
+					if (_v1.$ === 'Nothing') {
+						return _Utils_update(
+							model,
+							{
+								changedNewIngs: A3($author$project$Main$replaceFood, model.changedNewIngs, food, strng)
+							});
+					} else {
 						var x = _v1.a;
+						return _Utils_update(
+							model,
+							{
+								changedNewIngs: A3($author$project$Main$replaceFood, model.changedNewIngs, food, strng)
+							});
+					}
+				case 'AddNewIngredient':
+					var _v2 = $author$project$Main$numberPresentHelper(
+						$elm$core$String$words(model.total));
+					if (_v2.$ === 'Just') {
+						var x = _v2.a;
 						var lstOfRest = $author$project$Main$removeNumber(
 							$elm$core$String$words(model.total));
 						var restOfString = A2($elm$core$String$join, ' ', lstOfRest);
@@ -5675,13 +5720,21 @@ var $author$project$Main$update = F2(
 									model.changedNewIngs,
 									_List_fromArray(
 										[
-											{food: restOfString, quantity: x * model.sliderVal, quantityPresent: true}
+											{
+											food: restOfString,
+											quantity: $elm$core$String$fromFloat(x * model.sliderVal),
+											quantityPresent: true
+										}
 										])),
 								listNewIngredients: _Utils_ap(
 									model.listNewIngredients,
 									_List_fromArray(
 										[
-											{food: restOfString, quantity: x, quantityPresent: true}
+											{
+											food: restOfString,
+											quantity: $elm$core$String$fromFloat(x),
+											quantityPresent: true
+										}
 										])),
 								noQuantFound: false,
 								total: ''
@@ -5694,13 +5747,13 @@ var $author$project$Main$update = F2(
 									model.changedNewIngs,
 									_List_fromArray(
 										[
-											{food: model.total, quantity: 1, quantityPresent: false}
+											{food: model.total, quantity: '', quantityPresent: false}
 										])),
 								listNewIngredients: _Utils_ap(
 									model.listNewIngredients,
 									_List_fromArray(
 										[
-											{food: model.total, quantity: 1, quantityPresent: false}
+											{food: model.total, quantity: '', quantityPresent: false}
 										])),
 								noQuantFound: true,
 								total: ''
@@ -5713,9 +5766,9 @@ var $author$project$Main$update = F2(
 						{total: tot});
 				case 'UpdateSlider':
 					var strng = msg.a;
-					var _v2 = $elm$core$String$toFloat(strng);
-					if (_v2.$ === 'Just') {
-						var x = _v2.a;
+					var _v3 = $elm$core$String$toFloat(strng);
+					if (_v3.$ === 'Just') {
+						var x = _v3.a;
 						return _Utils_update(
 							model,
 							{
@@ -5791,7 +5844,6 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$h5 = _VirtualDom_node('h5');
 var $elm$html$Html$h6 = _VirtualDom_node('h6');
 var $elm$html$Html$input = _VirtualDom_node('input');
@@ -6122,13 +6174,15 @@ var $author$project$Main$newViewIngredientsLeft = function (lst) {
 	} else {
 		var food = lst.a;
 		var foods = lst.b;
-		if (food.quantityPresent) {
-			var _v1 = A2(
+		var _v1 = $elm$core$String$toFloat(food.quantity);
+		if (_v1.$ === 'Just') {
+			var y = _v1.a;
+			var _v2 = A2(
 				$elm$parser$Parser$run,
 				$elm$parser$Parser$int,
-				$elm$core$String$fromFloat(food.quantity));
-			if (_v1.$ === 'Ok') {
-				var x = _v1.a;
+				$elm$core$String$fromFloat(y));
+			if (_v2.$ === 'Ok') {
+				var x = _v2.a;
 				return _Utils_ap(
 					_List_fromArray(
 						[
@@ -6153,8 +6207,7 @@ var $author$project$Main$newViewIngredientsLeft = function (lst) {
 									_List_Nil,
 									_List_fromArray(
 										[
-											$elm$html$Html$text(
-											$elm$core$String$fromFloat(food.quantity) + (' ' + food.food))
+											$elm$html$Html$text(food.quantity + (' ' + food.food))
 										]))
 								]))
 						]),
@@ -6185,7 +6238,7 @@ var $author$project$Main$newViewIngredientsLeft = function (lst) {
 									_List_fromArray(
 										[
 											$elm$html$Html$text(
-											A2($myrho$elm_round$Round$round, 1, food.quantity) + (' ' + food.food))
+											A2($myrho$elm_round$Round$round, 1, y) + (' ' + food.food))
 										]))
 								]))
 						]),
@@ -6224,9 +6277,10 @@ var $author$project$Main$newViewIngredientsLeft = function (lst) {
 		}
 	}
 };
-var $author$project$Main$ScaleIngredient = function (a) {
-	return {$: 'ScaleIngredient', a: a};
-};
+var $author$project$Main$ScaleIngredient = F2(
+	function (a, b) {
+		return {$: 'ScaleIngredient', a: a, b: b};
+	});
 var $elm$html$Html$h4 = _VirtualDom_node('h4');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
@@ -6269,10 +6323,7 @@ var $author$project$Main$newViewIngredientsRight = function (lst) {
 		var food = lst.a;
 		var foods = lst.b;
 		if (food.quantityPresent) {
-			var _v1 = A2(
-				$elm$parser$Parser$run,
-				$elm$parser$Parser$int,
-				$elm$core$String$fromFloat(food.quantity));
+			var _v1 = A2($elm$parser$Parser$run, $elm$parser$Parser$int, food.quantity);
 			if (_v1.$ === 'Ok') {
 				var x = _v1.a;
 				return _Utils_ap(
@@ -6288,9 +6339,9 @@ var $author$project$Main$newViewIngredientsRight = function (lst) {
 									_List_fromArray(
 										[
 											$elm$html$Html$Attributes$class('indivIng'),
-											$elm$html$Html$Attributes$value(
-											$elm$core$String$fromFloat(food.quantity)),
-											$elm$html$Html$Events$onInput($author$project$Main$ScaleIngredient)
+											$elm$html$Html$Attributes$value(food.quantity),
+											$elm$html$Html$Events$onInput(
+											$author$project$Main$ScaleIngredient(food))
 										]),
 									_List_Nil),
 									A2(
@@ -6317,9 +6368,9 @@ var $author$project$Main$newViewIngredientsRight = function (lst) {
 									_List_fromArray(
 										[
 											$elm$html$Html$Attributes$class('indivIng'),
-											$elm$html$Html$Attributes$value(
-											$elm$core$String$fromFloat(food.quantity)),
-											$elm$html$Html$Events$onInput($author$project$Main$ScaleIngredient)
+											$elm$html$Html$Attributes$value(food.quantity),
+											$elm$html$Html$Events$onInput(
+											$author$project$Main$ScaleIngredient(food))
 										]),
 									_List_Nil),
 									A2(

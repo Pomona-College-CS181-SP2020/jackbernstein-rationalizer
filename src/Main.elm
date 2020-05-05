@@ -23,7 +23,7 @@ main =
 
 type alias NewIngredient =
     { food : String
-    , quantity : Float
+    , quantity : String
     , quantityPresent : Bool
     }
 
@@ -76,14 +76,19 @@ type Msg
     | ChangeTotal String
     | AddNewIngredient
     | Delete NewIngredient
-    | ScaleIngredient String
+    | ScaleIngredient NewIngredient String
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        ScaleIngredient strng -> 
-            model
+        ScaleIngredient food strng -> 
+            case String.toFloat strng of 
+                Nothing -> 
+                    {model | changedNewIngs = replaceFood model.changedNewIngs food strng}
+
+                Just x ->
+                    {model | changedNewIngs = replaceFood model.changedNewIngs food strng}
 
         AddNewIngredient ->
             case numberPresentHelper (String.words model.total) of
@@ -96,8 +101,8 @@ update msg model =
                             String.join " " lstOfRest
                     in
                     { model
-                        | listNewIngredients = model.listNewIngredients ++ [ { food = restOfString, quantity = x, quantityPresent = True } ]
-                        , changedNewIngs = model.changedNewIngs ++ [ { food = restOfString, quantity = x * model.sliderVal, quantityPresent = True } ]
+                        | listNewIngredients = model.listNewIngredients ++ [ { food = restOfString, quantity = String.fromFloat x, quantityPresent = True } ]
+                        , changedNewIngs = model.changedNewIngs ++ [ { food = restOfString, quantity = String.fromFloat (x * model.sliderVal), quantityPresent = True } ]
                         , total = ""
                         , noQuantFound = False
                     }
@@ -108,8 +113,8 @@ update msg model =
 
                     else
                         { model
-                            | listNewIngredients = model.listNewIngredients ++ [ { food = model.total, quantity = 1, quantityPresent = False } ]
-                            , changedNewIngs = model.changedNewIngs ++ [ { food = model.total, quantity = 1, quantityPresent = False } ]
+                            | listNewIngredients = model.listNewIngredients ++ [ { food = model.total, quantity = "", quantityPresent = False } ]
+                            , changedNewIngs = model.changedNewIngs ++ [ { food = model.total, quantity = "", quantityPresent = False } ]
                             , total = ""
                             , noQuantFound = True
                         }
@@ -153,6 +158,17 @@ update msg model =
 
         Delete food ->
             { model | listNewIngredients = del model.listNewIngredients food, changedNewIngs = del model.changedNewIngs food }
+
+replaceFood : List NewIngredient -> NewIngredient -> String -> List NewIngredient
+replaceFood originalLst food newQuant =
+    case originalLst of 
+        [] ->
+            []
+        
+        ing::ings ->
+            if ing == food
+            then {ing | quantity = newQuant} :: ings
+            else ing :: replaceFood ings food newQuant
 
 
 removeNumber : List String -> List String
@@ -206,7 +222,11 @@ scale lst flt =
             []
 
         ing :: ings ->
-            { ing | quantity = ing.quantity * flt } :: scale ings flt
+            case String.toFloat ing.quantity of
+                Just x  -> 
+                    { ing | quantity = String.fromFloat (x * flt) } :: scale ings flt
+                Nothing ->
+                    ing :: scale ings flt
 
 
 
@@ -224,7 +244,7 @@ view model =
                 ]
             , div [ class "slider" ]
                 [ div [] [ text (String.fromFloat model.sliderVal) ]
-                , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "10", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
+                , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
                 ]
             , div []
                 [ div [ class "recipeContainer" ]
@@ -248,7 +268,7 @@ view model =
                 ]
             , div [ class "slider" ]
                 [ div [] [ text (String.fromFloat model.sliderVal) ]
-                , input [ type_ "range", Html.Attributes.min ".01", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".01", class "sliderConfig", onInput UpdateSlider ] []
+                , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
                 ]
             , div []
                 [ div [ class "recipeContainer" ]
@@ -277,31 +297,32 @@ newViewIngredientsLeft lst =
             []
 
         food :: foods ->
-            if food.quantityPresent then
-                case Parser.run int (String.fromFloat food.quantity) of
-                    Ok x ->
+                case String.toFloat food.quantity of 
+                    Just y -> 
+                        case Parser.run int (String.fromFloat y) of
+                            Ok x ->
+                                [ div []
+                                    [ button [ onClick (Delete food) ] [ text "X" ]
+                                    , h3 [] [ text (food.quantity ++ " " ++ food.food) ]
+                                    ]
+                                ]
+                                    ++ newViewIngredientsLeft foods
+
+                            _ ->
+                                [ div []
+                                    [ button [ onClick (Delete food) ] [ text "X" ]
+                                    , h3 [] [ text ((Round.round 1 y) ++ " " ++ food.food) ]
+                                    ]
+                                ]
+                                    ++ newViewIngredientsLeft foods
+                    Nothing ->
                         [ div []
                             [ button [ onClick (Delete food) ] [ text "X" ]
-                            , h3 [] [ text (String.fromFloat food.quantity ++ " " ++ food.food) ]
+                            , h3 [] [ text food.food ]
                             ]
                         ]
                             ++ newViewIngredientsLeft foods
 
-                    _ ->
-                        [ div []
-                            [ button [ onClick (Delete food) ] [ text "X" ]
-                            , h3 [] [ text (Round.round 1 food.quantity ++ " " ++ food.food) ]
-                            ]
-                        ]
-                            ++ newViewIngredientsLeft foods
-
-            else
-                [ div []
-                    [ button [ onClick (Delete food) ] [ text "X" ]
-                    , h3 [] [ text food.food ]
-                    ]
-                ]
-                    ++ newViewIngredientsLeft foods
 
 
 newViewIngredientsRight : List NewIngredient -> List (Html Msg)
@@ -312,10 +333,10 @@ newViewIngredientsRight lst =
 
         food :: foods ->
             if food.quantityPresent then
-                case Parser.run int (String.fromFloat food.quantity) of
+                case Parser.run int food.quantity of
                     Ok x ->
                         [ div []
-                            [ input [class "indivIng", value (String.fromFloat food.quantity), onInput ScaleIngredient] [] 
+                            [ input [class "indivIng", value food.quantity, onInput (ScaleIngredient food)] [] 
                             , h4 [] [ text (" " ++ food.food) ]
                             ]
                         ]
@@ -323,7 +344,7 @@ newViewIngredientsRight lst =
 
                     _ ->
                         [ div []
-                            [ input [class "indivIng", value (String.fromFloat food.quantity), onInput ScaleIngredient] []
+                            [ input [class "indivIng", value food.quantity, onInput (ScaleIngredient food)] []
                             , h4 [] [ text (" " ++ food.food) ]
                             ]
                         ]
