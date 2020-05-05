@@ -5347,6 +5347,28 @@ var $author$project$Main$del = F2(
 				A2($author$project$Main$del, foods, ing));
 		}
 	});
+var $elm$core$String$toFloat = _String_toFloat;
+var $author$project$Main$findFoodQuant = F2(
+	function (lst, match) {
+		findFoodQuant:
+		while (true) {
+			if (!lst.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var ing = lst.a;
+				var ings = lst.b;
+				if (_Utils_eq(ing.food, match.food)) {
+					return $elm$core$String$toFloat(ing.quantity);
+				} else {
+					var $temp$lst = ings,
+						$temp$match = match;
+					lst = $temp$lst;
+					match = $temp$match;
+					continue findFoodQuant;
+				}
+			}
+		}
+	});
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$parser$Parser$ExpectingFloat = {$: 'ExpectingFloat'};
 var $elm$parser$Parser$Advanced$Parser = function (a) {
@@ -5434,7 +5456,6 @@ var $elm$parser$Parser$Advanced$fromInfo = F4(
 			$elm$parser$Parser$Advanced$Empty,
 			A4($elm$parser$Parser$Advanced$DeadEnd, row, col, x, context));
 	});
-var $elm$core$String$toFloat = _String_toFloat;
 var $elm$parser$Parser$Advanced$finalizeFloat = F6(
 	function (invalid, expecting, intSettings, floatSettings, intPair, s) {
 		var intOffset = intPair.a;
@@ -5681,6 +5702,32 @@ var $author$project$Main$scale = F2(
 			}
 		}
 	});
+var $author$project$Main$scaleIngs = F2(
+	function (lst, flt) {
+		if (!lst.b) {
+			return _List_Nil;
+		} else {
+			var ing = lst.a;
+			var ings = lst.b;
+			var _v1 = $elm$core$String$toFloat(ing.quantity);
+			if (_v1.$ === 'Nothing') {
+				return A2(
+					$elm$core$List$cons,
+					ing,
+					A2($author$project$Main$scaleIngs, ings, flt));
+			} else {
+				var x = _v1.a;
+				return A2(
+					$elm$core$List$cons,
+					_Utils_update(
+						ing,
+						{
+							quantity: $elm$core$String$fromFloat(x * flt)
+						}),
+					A2($author$project$Main$scaleIngs, ings, flt));
+			}
+		}
+	});
 var $elm$core$String$words = _String_words;
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -5699,17 +5746,28 @@ var $author$project$Main$update = F2(
 							});
 					} else {
 						var x = _v1.a;
-						return _Utils_update(
-							model,
-							{
-								changedNewIngs: A3($author$project$Main$replaceFood, model.changedNewIngs, food, strng)
-							});
+						var originalQuant = A2($author$project$Main$findFoodQuant, model.listNewIngredients, food);
+						if (originalQuant.$ === 'Nothing') {
+							return _Utils_update(
+								model,
+								{
+									changedNewIngs: A3($author$project$Main$replaceFood, model.changedNewIngs, food, strng)
+								});
+						} else {
+							var y = originalQuant.a;
+							var scalr = x / y;
+							return _Utils_update(
+								model,
+								{
+									changedNewIngs: A2($author$project$Main$scaleIngs, model.listNewIngredients, scalr)
+								});
+						}
 					}
 				case 'AddNewIngredient':
-					var _v2 = $author$project$Main$numberPresentHelper(
+					var _v3 = $author$project$Main$numberPresentHelper(
 						$elm$core$String$words(model.total));
-					if (_v2.$ === 'Just') {
-						var x = _v2.a;
+					if (_v3.$ === 'Just') {
+						var x = _v3.a;
 						var lstOfRest = $author$project$Main$removeNumber(
 							$elm$core$String$words(model.total));
 						var restOfString = A2($elm$core$String$join, ' ', lstOfRest);
@@ -5766,9 +5824,9 @@ var $author$project$Main$update = F2(
 						{total: tot});
 				case 'UpdateSlider':
 					var strng = msg.a;
-					var _v3 = $elm$core$String$toFloat(strng);
-					if (_v3.$ === 'Just') {
-						var x = _v3.a;
+					var _v4 = $elm$core$String$toFloat(strng);
+					if (_v4.$ === 'Just') {
+						var x = _v4.a;
 						return _Utils_update(
 							model,
 							{
@@ -6489,7 +6547,7 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$Attributes$type_('range'),
 								$elm$html$Html$Attributes$min('.1'),
-								$elm$html$Html$Attributes$max('10'),
+								$elm$html$Html$Attributes$max('20'),
 								$elm$html$Html$Attributes$value(
 								$elm$core$String$fromFloat(model.sliderVal)),
 								$elm$html$Html$Attributes$step('.1'),
@@ -6595,11 +6653,11 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$type_('range'),
-								$elm$html$Html$Attributes$min('.01'),
+								$elm$html$Html$Attributes$min('.1'),
 								$elm$html$Html$Attributes$max('20'),
 								$elm$html$Html$Attributes$value(
 								$elm$core$String$fromFloat(model.sliderVal)),
-								$elm$html$Html$Attributes$step('.01'),
+								$elm$html$Html$Attributes$step('.1'),
 								$elm$html$Html$Attributes$class('sliderConfig'),
 								$elm$html$Html$Events$onInput($author$project$Main$UpdateSlider)
 							]),

@@ -88,7 +88,18 @@ update msg model =
                     {model | changedNewIngs = replaceFood model.changedNewIngs food strng}
 
                 Just x ->
-                    {model | changedNewIngs = replaceFood model.changedNewIngs food strng}
+                    let
+                        originalQuant = findFoodQuant model.listNewIngredients food
+                    in
+                        case originalQuant of 
+                            Nothing -> 
+                                {model | changedNewIngs = replaceFood model.changedNewIngs food strng}
+
+                            Just y -> 
+                                let 
+                                    scalr = x / y
+                                in 
+                                    { model | changedNewIngs = scaleIngs model.listNewIngredients scalr }
 
         AddNewIngredient ->
             case numberPresentHelper (String.words model.total) of
@@ -158,6 +169,33 @@ update msg model =
 
         Delete food ->
             { model | listNewIngredients = del model.listNewIngredients food, changedNewIngs = del model.changedNewIngs food }
+
+
+scaleIngs : List NewIngredient -> Float -> List NewIngredient
+scaleIngs lst flt = 
+    case lst of 
+        [] ->
+            []
+        
+        ing::ings ->
+            case String.toFloat ing.quantity of 
+                Nothing ->
+                    ing :: scaleIngs ings flt
+
+                Just x ->
+                    {ing | quantity = String.fromFloat (x * flt)} :: scaleIngs ings flt
+
+
+findFoodQuant : List NewIngredient -> NewIngredient -> Maybe Float
+findFoodQuant lst match = 
+    case lst of 
+        [] ->
+            Nothing
+        
+        ing::ings ->
+            if ing.food == match.food
+            then String.toFloat ing.quantity
+            else findFoodQuant ings match
 
 replaceFood : List NewIngredient -> NewIngredient -> String -> List NewIngredient
 replaceFood originalLst food newQuant =
