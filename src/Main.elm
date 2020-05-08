@@ -39,7 +39,7 @@ type alias Recipe =
     , listNewIngredients : List NewIngredient
     , changedNewIngs : List NewIngredient
     , noQuantFound : Bool
-    , inputError : Bool 
+    , inputError : Bool
     }
 
 
@@ -84,26 +84,30 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        ScaleIngredient food strng -> 
-            case String.toFloat strng of 
-                Nothing -> 
-                    if String.isEmpty strng
-                    then {model | changedNewIngs = replaceFood model.changedNewIngs food strng}
-                    else {model | changedNewIngs = replaceFood model.changedNewIngs food strng, inputError = True}
+        ScaleIngredient food strng ->
+            case String.toFloat strng of
+                Nothing ->
+                    if String.isEmpty strng then
+                        { model | changedNewIngs = replaceFood model.changedNewIngs food strng }
+
+                    else
+                        { model | changedNewIngs = replaceFood model.changedNewIngs food strng, inputError = True }
 
                 Just x ->
                     let
-                        originalQuant = findFoodQuant model.listNewIngredients food
+                        originalQuant =
+                            findFoodQuant model.listNewIngredients food
                     in
-                        case originalQuant of 
-                            Nothing -> 
-                                {model | changedNewIngs = replaceFood model.changedNewIngs food strng}
+                    case originalQuant of
+                        Nothing ->
+                            { model | changedNewIngs = replaceFood model.changedNewIngs food strng }
 
-                            Just y -> 
-                                let 
-                                    scalr = x / y
-                                in 
-                                    { model | changedNewIngs = replaceFood (scaleIngs model.listNewIngredients scalr food) food strng, inputError = False}
+                        Just y ->
+                            let
+                                scalr =
+                                    x / y
+                            in
+                            { model | changedNewIngs = replaceFood (scaleIngs model.listNewIngredients scalr food) food strng, inputError = False }
 
         AddNewIngredient ->
             case numberPresentHelper (String.words model.total) of
@@ -135,12 +139,12 @@ update msg model =
                         }
 
         ChangeTotal tot ->
-            { model | total = tot}
+            { model | total = tot }
 
         UpdateSlider strng ->
             case String.toFloat strng of
                 Just x ->
-                    { model | sliderVal = x, changedNewIngs = scale model.listNewIngredients x , inputError = False}
+                    { model | sliderVal = x, changedNewIngs = scale model.listNewIngredients x, inputError = False }
 
                 Nothing ->
                     model
@@ -176,49 +180,55 @@ update msg model =
 
 
 scaleIngs : List NewIngredient -> Float -> NewIngredient -> List NewIngredient
-scaleIngs lst flt fd = 
-    case lst of 
+scaleIngs lst flt fd =
+    case lst of
         [] ->
             []
-        
-        ing::ings ->
-            if fd == ing
-            then ing :: scaleIngs ings flt fd  
+
+        ing :: ings ->
+            if fd == ing then
+                ing :: scaleIngs ings flt fd
+
             else
-                case String.toFloat ing.quantity of 
-                Nothing ->
-                    ing :: scaleIngs ings flt fd 
+                case String.toFloat ing.quantity of
+                    Nothing ->
+                        ing :: scaleIngs ings flt fd
 
-                Just x ->
-                    case Parser.run int (String.fromFloat (x * flt)) of
-                        Ok y -> 
-                            {ing | quantity = String.fromInt y} :: scaleIngs ings flt fd 
+                    Just x ->
+                        case Parser.run int (String.fromFloat (x * flt)) of
+                            Ok y ->
+                                { ing | quantity = String.fromInt y } :: scaleIngs ings flt fd
 
-                        _ -> 
-                            {ing | quantity = Round.round 1 (x * flt) } :: scaleIngs ings flt fd
+                            _ ->
+                                { ing | quantity = Round.round 1 (x * flt) } :: scaleIngs ings flt fd
 
 
 findFoodQuant : List NewIngredient -> NewIngredient -> Maybe Float
-findFoodQuant lst match = 
-    case lst of 
+findFoodQuant lst match =
+    case lst of
         [] ->
             Nothing
-        
-        ing::ings ->
-            if ing.food == match.food
-            then String.toFloat ing.quantity
-            else findFoodQuant ings match
+
+        ing :: ings ->
+            if ing.food == match.food then
+                String.toFloat ing.quantity
+
+            else
+                findFoodQuant ings match
+
 
 replaceFood : List NewIngredient -> NewIngredient -> String -> List NewIngredient
 replaceFood originalLst food newQuant =
-    case originalLst of 
+    case originalLst of
         [] ->
             []
-        
-        ing::ings ->
-            if ing.food == food.food
-            then {ing | quantity = newQuant} :: ings
-            else ing :: replaceFood ings food newQuant
+
+        ing :: ings ->
+            if ing.food == food.food then
+                { ing | quantity = newQuant } :: ings
+
+            else
+                ing :: replaceFood ings food newQuant
 
 
 removeNumber : List String -> List String
@@ -273,8 +283,9 @@ scale lst flt =
 
         ing :: ings ->
             case String.toFloat ing.quantity of
-                Just x  -> 
+                Just x ->
                     { ing | quantity = String.fromFloat (x * flt) } :: scale ings flt
+
                 Nothing ->
                     ing :: scale ings flt
 
@@ -285,8 +296,7 @@ scale lst flt =
 
 view : Model -> Html Msg
 view model =
-    if model.inputError
-    then
+    if model.inputError then
         if model.noQuantFound then
             div []
                 [ div [ class "ingredientInput2", onKeyDown KeyDown ]
@@ -297,17 +307,17 @@ view model =
                 , div [ class "slider" ]
                     [ div [] [ text (String.fromFloat model.sliderVal) ]
                     , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
-                    , div [] [text "Invalid quantity input"]
+                    , div [] [ text "Invalid quantity input" ]
                     ]
                 , div []
                     [ div [ class "recipeContainer" ]
                         ([ h5 [] [ text "Original Recipe" ]
-                        ]
+                         ]
                             ++ newViewIngredientsLeft model.listNewIngredients
                         )
                     , div [ class "recipeContainerRight" ]
                         ([ h6 [] [ text "Scaled Recipe" ]
-                        ]
+                         ]
                             ++ newViewIngredientsRight model.changedNewIngs
                         )
                     ]
@@ -322,70 +332,70 @@ view model =
                 , div [ class "slider" ]
                     [ div [] [ text (String.fromFloat model.sliderVal) ]
                     , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
-                    , div [] [text "Invalid quantity input"]
+                    , div [] [ text "Invalid quantity input" ]
                     ]
                 , div []
                     [ div [ class "recipeContainer" ]
                         ([ h5 [] [ text "Original Recipe" ]
-                        ]
+                         ]
                             ++ newViewIngredientsLeft model.listNewIngredients
                         )
                     , div [ class "recipeContainerRight" ]
                         ([ h6 [] [ text "Scaled Recipe" ]
-                        ]
-                            ++ newViewIngredientsRight model.changedNewIngs
-                        )
-                    ]
-                ]
-    else 
-        if model.noQuantFound then
-            div []
-                [ div [ class "ingredientInput2", onKeyDown KeyDown ]
-                    [ div [ class "bigFont" ] [ text "Input an ingredient with a quantity, then hit enter" ]
-                    , div [] [ input [ placeholder "3 teaspoons of sugar", value model.total, onInput ChangeTotal ] [] ]
-                    , div [] [ text "Ingredient will not be scaled because no quantity was found" ]
-                    ]
-                , div [ class "slider" ]
-                    [ div [] [ text (String.fromFloat model.sliderVal) ]
-                    , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
-                    ]
-                , div []
-                    [ div [ class "recipeContainer" ]
-                        ([ h5 [] [ text "Original Recipe" ]
-                        ]
-                            ++ newViewIngredientsLeft model.listNewIngredients
-                        )
-                    , div [ class "recipeContainerRight" ]
-                        ([ h6 [] [ text "Scaled Recipe" ]
-                        ]
+                         ]
                             ++ newViewIngredientsRight model.changedNewIngs
                         )
                     ]
                 ]
 
-        else
-            div []
-                [ div [ class "ingredientInput", onKeyDown KeyDown ]
-                    [ div [ class "bigFont" ] [ text "Input an ingredient with a quantity, then hit enter" ]
-                    , input [ placeholder "3 teaspoons of sugar", value model.total, onInput ChangeTotal ] []
-                    ]
-                , div [ class "slider" ]
-                    [ div [] [ text (String.fromFloat model.sliderVal) ]
-                    , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
-                    ]
-                , div []
-                    [ div [ class "recipeContainer" ]
-                        ([ h5 [] [ text "Original Recipe" ]
-                        ]
-                            ++ newViewIngredientsLeft model.listNewIngredients
-                        )
-                    , div [ class "recipeContainerRight" ]
-                        ([ h6 [] [ text "Scaled Recipe" ]
-                        ]
-                            ++ newViewIngredientsRight model.changedNewIngs
-                        )
-                    ]
+    else if model.noQuantFound then
+        div []
+            [ div [ class "ingredientInput2", onKeyDown KeyDown ]
+                [ div [ class "bigFont" ] [ text "Input an ingredient with a quantity, then hit enter" ]
+                , div [] [ input [ placeholder "3 teaspoons of sugar", value model.total, onInput ChangeTotal ] [] ]
+                , div [] [ text "Ingredient will not be scaled because no quantity was found" ]
                 ]
+            , div [ class "slider" ]
+                [ div [] [ text (String.fromFloat model.sliderVal) ]
+                , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
+                ]
+            , div []
+                [ div [ class "recipeContainer" ]
+                    ([ h5 [] [ text "Original Recipe" ]
+                     ]
+                        ++ newViewIngredientsLeft model.listNewIngredients
+                    )
+                , div [ class "recipeContainerRight" ]
+                    ([ h6 [] [ text "Scaled Recipe" ]
+                     ]
+                        ++ newViewIngredientsRight model.changedNewIngs
+                    )
+                ]
+            ]
+
+    else
+        div []
+            [ div [ class "ingredientInput", onKeyDown KeyDown ]
+                [ div [ class "bigFont" ] [ text "Input an ingredient with a quantity, then hit enter" ]
+                , input [ placeholder "3 teaspoons of sugar", value model.total, onInput ChangeTotal ] []
+                ]
+            , div [ class "slider" ]
+                [ div [] [ text (String.fromFloat model.sliderVal) ]
+                , input [ type_ "range", Html.Attributes.min ".1", Html.Attributes.max "20", value (String.fromFloat model.sliderVal), step ".1", class "sliderConfig", onInput UpdateSlider ] []
+                ]
+            , div []
+                [ div [ class "recipeContainer" ]
+                    ([ h5 [] [ text "Original Recipe" ]
+                     ]
+                        ++ newViewIngredientsLeft model.listNewIngredients
+                    )
+                , div [ class "recipeContainerRight" ]
+                    ([ h6 [] [ text "Scaled Recipe" ]
+                     ]
+                        ++ newViewIngredientsRight model.changedNewIngs
+                    )
+                ]
+            ]
 
 
 onKeyDown : (Int -> msg) -> Attribute msg
@@ -400,32 +410,32 @@ newViewIngredientsLeft lst =
             []
 
         food :: foods ->
-                case String.toFloat food.quantity of 
-                    Just y -> 
-                        case Parser.run int (String.fromFloat y) of
-                            Ok x ->
-                                [ div []
-                                    [ button [ onClick (Delete food) ] [ text "X" ]
-                                    , h3 [] [ text (food.quantity ++ " " ++ food.food) ]
-                                    ]
+            case String.toFloat food.quantity of
+                Just y ->
+                    case Parser.run int (String.fromFloat y) of
+                        Ok x ->
+                            [ div []
+                                [ button [ onClick (Delete food) ] [ text "X" ]
+                                , h3 [] [ text (food.quantity ++ " " ++ food.food) ]
                                 ]
-                                    ++ newViewIngredientsLeft foods
-
-                            _ ->
-                                [ div []
-                                    [ button [ onClick (Delete food) ] [ text "X" ]
-                                    , h3 [] [ text ((Round.round 1 y) ++ " " ++ food.food) ]
-                                    ]
-                                ]
-                                    ++ newViewIngredientsLeft foods
-                    Nothing ->
-                        [ div []
-                            [ button [ onClick (Delete food) ] [ text "X" ]
-                            , h3 [] [ text food.food ]
                             ]
-                        ]
-                            ++ newViewIngredientsLeft foods
+                                ++ newViewIngredientsLeft foods
 
+                        _ ->
+                            [ div []
+                                [ button [ onClick (Delete food) ] [ text "X" ]
+                                , h3 [] [ text (Round.round 1 y ++ " " ++ food.food) ]
+                                ]
+                            ]
+                                ++ newViewIngredientsLeft foods
+
+                Nothing ->
+                    [ div []
+                        [ button [ onClick (Delete food) ] [ text "X" ]
+                        , h3 [] [ text food.food ]
+                        ]
+                    ]
+                        ++ newViewIngredientsLeft foods
 
 
 newViewIngredientsRight : List NewIngredient -> List (Html Msg)
@@ -439,7 +449,7 @@ newViewIngredientsRight lst =
                 case Parser.run int food.quantity of
                     Ok x ->
                         [ div []
-                            [ input [class "indivIng", value food.quantity, onInput (ScaleIngredient food)] [] 
+                            [ input [ class "indivIng", value food.quantity, onInput (ScaleIngredient food) ] []
                             , h4 [] [ text (" " ++ food.food) ]
                             ]
                         ]
@@ -447,7 +457,7 @@ newViewIngredientsRight lst =
 
                     _ ->
                         [ div []
-                            [ input [class "indivIng", value food.quantity, onInput (ScaleIngredient food)] []
+                            [ input [ class "indivIng", value food.quantity, onInput (ScaleIngredient food) ] []
                             , h4 [] [ text (" " ++ food.food) ]
                             ]
                         ]
