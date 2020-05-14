@@ -29,7 +29,7 @@ type alias NewIngredient =
 
 
 type alias Recipe =
-    {  sliderVal : Float
+    { sliderVal : Float
     , total : String
     , listNewIngredients : List NewIngredient
     , changedNewIngs : List NewIngredient
@@ -255,10 +255,11 @@ scale lst flt =
             case String.toFloat ing.quantity of
                 Just x ->
                     case Parser.run int (String.fromFloat (x * flt)) of
-                        Ok y -> 
+                        Ok y ->
                             { ing | quantity = String.fromInt y } :: scale ings flt
+
                         _ ->
-                            { ing | quantity = Round.round 2 (x * flt)} :: scale ings flt
+                            { ing | quantity = Round.round 2 (x * flt) } :: scale ings flt
 
                 Nothing ->
                     ing :: scale ings flt
