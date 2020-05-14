@@ -4603,7 +4603,7 @@ var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$Basics$False = {$: 'False'};
-var $author$project$Main$init = {changedNewIngs: _List_Nil, inputError: false, listNewIngredients: _List_Nil, noQuantFound: false, optionFood: '', optionNumb: '', sliderVal: 1.0, tempFood: '', tempQuant: '', tempUnit: '', total: ''};
+var $author$project$Main$init = {changedNewIngs: _List_Nil, inputError: false, listNewIngredients: _List_Nil, noQuantFound: false, sliderVal: 1.0, total: ''};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -5676,32 +5676,6 @@ var $author$project$Main$replaceFood = F3(
 				A3($author$project$Main$replaceFood, ings, food, newQuant));
 		}
 	});
-var $author$project$Main$scale = F2(
-	function (lst, flt) {
-		if (!lst.b) {
-			return _List_Nil;
-		} else {
-			var ing = lst.a;
-			var ings = lst.b;
-			var _v1 = $elm$core$String$toFloat(ing.quantity);
-			if (_v1.$ === 'Just') {
-				var x = _v1.a;
-				return A2(
-					$elm$core$List$cons,
-					_Utils_update(
-						ing,
-						{
-							quantity: $elm$core$String$fromFloat(x * flt)
-						}),
-					A2($author$project$Main$scale, ings, flt));
-			} else {
-				return A2(
-					$elm$core$List$cons,
-					ing,
-					A2($author$project$Main$scale, ings, flt));
-			}
-		}
-	});
 var $elm$parser$Parser$ExpectingInt = {$: 'ExpectingInt'};
 var $elm$parser$Parser$Advanced$int = F2(
 	function (expecting, invalid) {
@@ -5997,6 +5971,48 @@ var $myrho$elm_round$Round$round = $myrho$elm_round$Round$roundFun(
 				}
 			}
 		}));
+var $author$project$Main$scale = F2(
+	function (lst, flt) {
+		if (!lst.b) {
+			return _List_Nil;
+		} else {
+			var ing = lst.a;
+			var ings = lst.b;
+			var _v1 = $elm$core$String$toFloat(ing.quantity);
+			if (_v1.$ === 'Just') {
+				var x = _v1.a;
+				var _v2 = A2(
+					$elm$parser$Parser$run,
+					$elm$parser$Parser$int,
+					$elm$core$String$fromFloat(x * flt));
+				if (_v2.$ === 'Ok') {
+					var y = _v2.a;
+					return A2(
+						$elm$core$List$cons,
+						_Utils_update(
+							ing,
+							{
+								quantity: $elm$core$String$fromInt(y)
+							}),
+						A2($author$project$Main$scale, ings, flt));
+				} else {
+					return A2(
+						$elm$core$List$cons,
+						_Utils_update(
+							ing,
+							{
+								quantity: A2($myrho$elm_round$Round$round, 2, x * flt)
+							}),
+						A2($author$project$Main$scale, ings, flt));
+				}
+			} else {
+				return A2(
+					$elm$core$List$cons,
+					ing,
+					A2($author$project$Main$scale, ings, flt));
+			}
+		}
+	});
 var $author$project$Main$scaleIngs = F3(
 	function (lst, flt, fd) {
 		if (!lst.b) {
@@ -6038,7 +6054,7 @@ var $author$project$Main$scaleIngs = F3(
 							_Utils_update(
 								ing,
 								{
-									quantity: A2($myrho$elm_round$Round$round, 1, x * flt)
+									quantity: A2($myrho$elm_round$Round$round, 2, x * flt)
 								}),
 							A3($author$project$Main$scaleIngs, ings, flt, fd));
 					}
@@ -6176,28 +6192,6 @@ var $author$project$Main$update = F2(
 					} else {
 						return model;
 					}
-				case 'SetOption':
-					var strng = msg.a;
-					return (strng === 'Select an Ingredient') ? _Utils_update(
-						model,
-						{optionFood: '', optionNumb: ''}) : _Utils_update(
-						model,
-						{optionFood: strng, optionNumb: ''});
-				case 'ChangeTempFood':
-					var food = msg.a;
-					return _Utils_update(
-						model,
-						{tempFood: food});
-				case 'ChangeTempQuant':
-					var quant = msg.a;
-					return _Utils_update(
-						model,
-						{tempQuant: quant});
-				case 'ChangeTempUnit':
-					var unit = msg.a;
-					return _Utils_update(
-						model,
-						{tempUnit: unit});
 				case 'Scale':
 					var flt = msg.a;
 					return model;
@@ -6330,7 +6324,7 @@ var $author$project$Main$newViewIngredientsLeft = function (lst) {
 									_List_fromArray(
 										[
 											$elm$html$Html$text(
-											A2($myrho$elm_round$Round$round, 1, y) + (' ' + food.food))
+											A2($myrho$elm_round$Round$round, 2, y) + (' ' + food.food))
 										]))
 								]))
 						]),

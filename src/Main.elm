@@ -29,12 +29,7 @@ type alias NewIngredient =
 
 
 type alias Recipe =
-    { tempFood : String
-    , tempQuant : String
-    , tempUnit : String
-    , optionFood : String
-    , optionNumb : String
-    , sliderVal : Float
+    {  sliderVal : Float
     , total : String
     , listNewIngredients : List NewIngredient
     , changedNewIngs : List NewIngredient
@@ -49,12 +44,7 @@ type alias Model =
 
 init : Model
 init =
-    { tempFood = ""
-    , tempQuant = ""
-    , tempUnit = ""
-    , optionFood = ""
-    , optionNumb = ""
-    , sliderVal = 1.0
+    { sliderVal = 1.0
     , total = ""
     , listNewIngredients = []
     , changedNewIngs = []
@@ -68,11 +58,7 @@ init =
 
 
 type Msg
-    = ChangeTempFood String
-    | ChangeTempQuant String
-    | ChangeTempUnit String
-    | SetOption String
-    | Scale Float
+    = Scale Float
     | KeyDown Int
     | UpdateSlider String
     | ChangeTotal String
@@ -156,22 +142,6 @@ update msg model =
             else
                 model
 
-        SetOption strng ->
-            if strng == "Select an Ingredient" then
-                { model | optionFood = "", optionNumb = "" }
-
-            else
-                { model | optionFood = strng, optionNumb = "" }
-
-        ChangeTempFood food ->
-            { model | tempFood = food }
-
-        ChangeTempQuant quant ->
-            { model | tempQuant = quant }
-
-        ChangeTempUnit unit ->
-            { model | tempUnit = unit }
-
         Scale flt ->
             model
 
@@ -200,7 +170,7 @@ scaleIngs lst flt fd =
                                 { ing | quantity = String.fromInt y } :: scaleIngs ings flt fd
 
                             _ ->
-                                { ing | quantity = Round.round 1 (x * flt) } :: scaleIngs ings flt fd
+                                { ing | quantity = Round.round 2 (x * flt) } :: scaleIngs ings flt fd
 
 
 findFoodQuant : List NewIngredient -> NewIngredient -> Maybe Float
@@ -284,7 +254,11 @@ scale lst flt =
         ing :: ings ->
             case String.toFloat ing.quantity of
                 Just x ->
-                    { ing | quantity = String.fromFloat (x * flt) } :: scale ings flt
+                    case Parser.run int (String.fromFloat (x * flt)) of
+                        Ok y -> 
+                            { ing | quantity = String.fromInt y } :: scale ings flt
+                        _ ->
+                            { ing | quantity = Round.round 2 (x * flt)} :: scale ings flt
 
                 Nothing ->
                     ing :: scale ings flt
@@ -424,7 +398,7 @@ newViewIngredientsLeft lst =
                         _ ->
                             [ div []
                                 [ button [ onClick (Delete food) ] [ text "X" ]
-                                , h3 [] [ text (Round.round 1 y ++ " " ++ food.food) ]
+                                , h3 [] [ text (Round.round 2 y ++ " " ++ food.food) ]
                                 ]
                             ]
                                 ++ newViewIngredientsLeft foods
